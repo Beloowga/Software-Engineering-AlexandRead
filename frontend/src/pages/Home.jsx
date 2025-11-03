@@ -15,7 +15,7 @@ export default function Home() {
         setBooks(res.data);
       } catch (err) {
         console.error(err);
-        setError("Impossible de charger les livres 😢. Vérifier si le backend est lancé et/ou la database est bien en ligne.");
+        setError("Impossible de charger les livres ... Vérifier si le backend est lancé et/ou la database est bien en ligne.");
       } finally {
         setLoading(false);
       }

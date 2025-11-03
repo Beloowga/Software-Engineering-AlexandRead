@@ -9,7 +9,7 @@ export async function getBooks(req, res) {
     .order('title');
 
   if (error) {
-    console.error('❌ Supabase getBooks error:', error);
+    console.error('Supabase getBooks error:', error);
     return res.status(500).json({ error: 'Database error' });
   }
 
@@ -27,7 +27,7 @@ export async function getBookById(req, res) {
     .maybeSingle();
 
   if (error) {
-    console.error('❌ Supabase getBookById error:', error);
+    console.error('Supabase getBookById error:', error);
     return res.status(500).json({ error: 'Database error' });
   }
 

@@ -17,7 +17,7 @@ export default function BookDetail() {
         setBook(res.data);
       } catch (err) {
         console.error(err);
-        setError("Livre introuvable 😢");
+        setError("Livre introuvable !");
       } finally {
         setLoading(false);
       }
@@ -81,7 +81,7 @@ export default function BookDetail() {
         </section>
       )}
 
-      {/* si tu veux afficher un aperçu inline pour les PDF */}
+      {/* si on veut afficher un aperçu inline pour les PDF */}
       {contentUrl && contentUrl.endsWith('.pdf') && (
         <section className="book-detail__section" style={{ marginTop: '1.5rem' }}>
           <h2>Aperçu</h2>

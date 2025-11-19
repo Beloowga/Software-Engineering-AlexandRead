@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { buildCoverUrl, buildBookContentUrl } from '../utils/storageUrls.js';
+import { buildCoverUrl } from '../utils/storageUrls.js';
+import SaveBookButton from './SaveBookButton.jsx';
 
 export default function BookCard({ book }) {
   const {
@@ -17,6 +18,7 @@ export default function BookCard({ book }) {
   return (
     <article className="book-card">
       <div className="book-card__image">
+        <SaveBookButton bookId={id} variant="card" />
         {imgUrl ? (
           <img
             src={imgUrl}
@@ -38,7 +40,7 @@ export default function BookCard({ book }) {
         </p>
         {summary && (
           <p className="book-card__summary">
-            {summary.length > 100 ? summary.slice(0, 100) + '…' : summary}
+            {summary.length > 100 ? `${summary.slice(0, 100)}…` : summary}
           </p>
         )}
         <Link className="book-card__link" to={`/books/${id}`}>

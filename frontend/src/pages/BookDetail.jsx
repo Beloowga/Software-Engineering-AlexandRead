@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../services/api.js';
 import Loader from '../components/Loader.jsx';
 import { buildCoverUrl, buildBookContentUrl } from '../utils/storageUrls.js';
+import SaveBookButton from '../components/SaveBookButton.jsx';
 
 export default function BookDetail() {
   const { id } = useParams();
@@ -52,8 +53,11 @@ export default function BookDetail() {
           <div className="book-detail__cover placeholder">No cover</div>
         )}
 
-        <div>
-          <h1>{book.title}</h1>
+        <div className="book-detail__meta-col">
+          <div className="book-detail__title-row">
+            <h1>{book.title}</h1>
+            <SaveBookButton bookId={book.id} variant="detail" />
+          </div>
           <p className="book-detail__author">{book.author}</p>
           <p className="book-detail__meta">
             {book.genre} {book.year ? `• ${book.year}` : ''}

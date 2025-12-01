@@ -6,6 +6,14 @@ const ACCOUNT_TABLE = process.env.SUPABASE_ACCOUNT_TABLE || 'account';
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
+function isActiveSubscription(row) {
+  if (!row?.end_sub_date) return false;
+  const endDate = new Date(row.end_sub_date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return endDate >= today;
+}
+
 if (!JWT_SECRET) {
   console.warn('[authController] JWT_SECRET is missing. Auth routes will fail until it is provided.');
 }
@@ -46,6 +54,8 @@ export function toProfileResponse(row) {
       value: row.sub_value ?? null,
       start: row.start_sub_date ?? null,
       end: row.end_sub_date ?? null,
+      autoRenew: Boolean(row.auto_renew),
+      isActive: isActiveSubscription(row),
     },
     createdAt: row.created_at,
   };
@@ -92,6 +102,7 @@ export async function register(req, res) {
       subscriptionValue,
       subscriptionStart,
       subscriptionEnd,
+      subscriptionAutoRenew,
     } = req.body || {};
 
     if (!email || !password || !pseudo) {
@@ -122,6 +133,7 @@ export async function register(req, res) {
       sub_value: subscriptionValue ?? null,
       start_sub_date: subscriptionStart || null,
       end_sub_date: subscriptionEnd || null,
+      auto_renew: subscriptionAutoRenew ?? false,
     };
 
     const { data, error } = await supabase

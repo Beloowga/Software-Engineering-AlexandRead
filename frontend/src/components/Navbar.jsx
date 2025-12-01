@@ -8,6 +8,7 @@ export default function Navbar() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
+  const isSubscribed = Boolean(user?.subscription?.isActive);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -50,40 +51,51 @@ export default function Navbar() {
         </Link>
         <nav className="navbar__links">
           <Link to="/">Home</Link>
-          {initializing ? (
-            <span className="account-loading">Loading account…</span>
-          ) : !user ? (
-            <button type="button" className="auth-btn" onClick={handleAuthNavigation}>
-              Sign In / Register
-            </button>
-          ) : (
-            <div className="account-menu" ref={menuRef}>
-              <button
-                type="button"
-                className="account-trigger"
-                onClick={() => setOpen((prev) => !prev)}
-              >
-                <span className="account-avatar">
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt={`${displayName} avatar`} />
-                  ) : (
-                    initials
-                  )}
-                </span>
-                <span className="account-name">{displayName}</span>
+          <div className="navbar__actions">
+            <Link
+              to="/subscription"
+              className={`subscription-link ${isSubscribed ? 'is-active' : ''}`}
+            >
+              <span className="subscription-icon" aria-hidden="true">
+                {isSubscribed ? '👑' : '+'}
+              </span>
+              <span>{isSubscribed ? 'Premium' : 'Subscribe'}</span>
+            </Link>
+            {initializing ? (
+              <span className="account-loading">Loading account…</span>
+            ) : !user ? (
+              <button type="button" className="auth-btn" onClick={handleAuthNavigation}>
+                Sign In / Register
               </button>
-              {open && (
-                <div className="account-dropdown">
-                  <button type="button" onClick={handleAccountDetails}>
-                    View account details
-                  </button>
-                  <button type="button" onClick={handleLogout}>
-                    Disconnect
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+            ) : (
+              <div className="account-menu" ref={menuRef}>
+                <button
+                  type="button"
+                  className="account-trigger"
+                  onClick={() => setOpen((prev) => !prev)}
+                >
+                  <span className="account-avatar">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} alt={`${displayName} avatar`} />
+                    ) : (
+                      initials
+                    )}
+                  </span>
+                  <span className="account-name">{displayName}</span>
+                </button>
+                {open && (
+                  <div className="account-dropdown">
+                    <button type="button" onClick={handleAccountDetails}>
+                      View account details
+                    </button>
+                    <button type="button" onClick={handleLogout}>
+                      Disconnect
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </nav>
       </div>
     </header>

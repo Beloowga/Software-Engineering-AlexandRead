@@ -5,7 +5,7 @@ import { supabase } from '../db.js';
 export async function getBooks(req, res) {
   const { data, error } = await supabase
     .from('books')
-    .select('id, author, title, genre, year, summary, cover_image')
+    .select('id, author, title, genre, year, summary, cover_image, premium')
     .order('title');
 
   if (error) {
@@ -22,7 +22,7 @@ export async function getBookById(req, res) {
 
   const { data, error } = await supabase
     .from('books')
-    .select('id, author, title, genre, year, summary, cover_image, content')
+    .select('id, author, title, genre, year, summary, cover_image, content, premium')
     .eq('id', id)
     .maybeSingle();
 

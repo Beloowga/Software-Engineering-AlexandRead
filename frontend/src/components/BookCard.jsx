@@ -11,6 +11,7 @@ export default function BookCard({ book }) {
     year,
     summary,
     cover_image,
+    premium,
   } = book;
 
   const imgUrl = buildCoverUrl(cover_image);
@@ -19,6 +20,7 @@ export default function BookCard({ book }) {
     <article className="book-card">
       <div className="book-card__image">
         <SaveBookButton bookId={id} variant="card" />
+        {premium && <span className="premium-badge">Premium</span>}
         {imgUrl ? (
           <img
             src={imgUrl}
@@ -36,15 +38,15 @@ export default function BookCard({ book }) {
         <h2 className="book-card__title">{title}</h2>
         <p className="book-card__author">{author}</p>
         <p className="book-card__meta">
-          {genre} {year ? `• ${year}` : ''}
+          {genre}{year ? ` - ${year}` : ''}
         </p>
         {summary && (
           <p className="book-card__summary">
-            {summary.length > 100 ? `${summary.slice(0, 100)}…` : summary}
+            {summary.length > 100 ? `${summary.slice(0, 100)}...` : summary}
           </p>
         )}
         <Link className="book-card__link" to={`/books/${id}`}>
-          Voir le livre →
+          View book
         </Link>
       </div>
     </article>

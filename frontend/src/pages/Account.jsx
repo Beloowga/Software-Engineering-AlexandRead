@@ -226,7 +226,10 @@ export default function AccountPage() {
                   <span role="img" aria-hidden="true">BK</span>
                 </div>
               )}
-              <span className="profile-pseudo">{displayName}</span>
+              <span className="profile-pseudo">
+                {displayName}
+                {user?.subscription?.isActive && <span className="subscription-badge">PRO</span>}
+              </span>
               <label className={`upload-btn ${avatarUploading ? 'disabled' : ''}`}>
                 <input
                   type="file"

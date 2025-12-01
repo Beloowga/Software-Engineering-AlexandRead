@@ -50,7 +50,25 @@ export default function Navbar() {
           AlexandRead
         </Link>
         <nav className="navbar__links">
-          <Link to="/">Home</Link>
+          <Link to="/" className="home-link">
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 11.5 12 4l9 7.5" />
+              <path d="M5 10v10h14V10" />
+              <path d="M9 20v-6h6v6" />
+            </svg>
+            <span>Home</span>
+          </Link>
           <div className="navbar__actions">
             <Link
               to="/subscription"

@@ -6,6 +6,7 @@ import Loader from '../components/Loader.jsx';
 
 export default function Home() {
   const [books, setBooks] = useState([]);
+  const [filteredBooks, setFilteredBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -14,9 +15,10 @@ export default function Home() {
       try {
         const res = await api.get('/books');
         setBooks(res.data);
+        setFilteredBooks(res.data);
       } catch (err) {
         console.error(err);
-        setError("Impossible de charger les livres ... Vérifier si le backend est lancé et/ou la database est bien en ligne.");
+        setError('Unable to load books. Check that the backend and database are running.');
       } finally {
         setLoading(false);
       }
@@ -24,18 +26,49 @@ export default function Home() {
     fetchBooks();
   }, []);
 
+  const applyFilters = (allBooks, filters) => {
+    return allBooks.filter((book) => {
+      if (filters.title && !book.title.toLowerCase().includes(filters.title.toLowerCase())) {
+        return false;
+      }
+      if (filters.author && !book.author.toLowerCase().includes(filters.author.toLowerCase())) {
+        return false;
+      }
+      if (filters.genre && book.genre !== filters.genre) {
+        return false;
+      }
+      if (filters.startYear && Number(book.year) < Number(filters.startYear)) {
+        return false;
+      }
+      if (filters.endYear && Number(book.year) > Number(filters.endYear)) {
+        return false;
+      }
+      if (filters.premium === 'true' && !book.premium) {
+        return false;
+      }
+      if (filters.premium === 'false' && book.premium) {
+        return false;
+      }
+      return true;
+    });
+  };
+
+  const handleSearch = (filters) => {
+    setFilteredBooks(applyFilters(books, filters));
+  };
+
   if (loading) return <Loader />;
   if (error) return <p className="error">{error}</p>;
 
   return (
     <div>
-      <h1 className="page-title">Catalogue</h1>
-      <SearchBar />
-      {books.length === 0 ? (
-        <p>Aucun livre pour le moment.</p>
+      <h1 className="page-title">Catalog search</h1>
+      <SearchBar onSearch={handleSearch} />
+      {filteredBooks.length === 0 ? (
+        <p className="empty-state">No books match your search.</p>
       ) : (
         <div className="books-grid">
-          {books.map((book) => (
+          {filteredBooks.map((book) => (
             <BookCard key={book.id} book={book} />
           ))}
         </div>

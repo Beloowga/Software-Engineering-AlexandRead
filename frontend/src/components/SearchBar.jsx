@@ -1,36 +1,21 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api.js';
+import { useState } from 'react';
+import { GENRE_OPTIONS } from '../constants/genres.js';
 import '../styles/SearchBar.css';
 
-export default function SearchBar() {
-  const navigate = useNavigate();
+export default function SearchBar({ onSearch = () => {} }) {
   const [filters, setFilters] = useState({
     title: '',
     author: '',
     genre: '',
-    year: '',
+    startYear: '',
+    endYear: '',
+    premium: '',
   });
-  const [genres, setGenres] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
-
-  // Fetch available genres from books
-  useEffect(() => {
-    async function fetchGenres() {
-      try {
-        const res = await api.get('/books');
-        const uniqueGenres = [...new Set(res.data.map(book => book.genre))].filter(Boolean).sort();
-        setGenres(uniqueGenres);
-      } catch (err) {
-        console.error('Error fetching genres:', err);
-      }
-    }
-    fetchGenres();
-  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
       [name]: value,
     }));
@@ -38,25 +23,20 @@ export default function SearchBar() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-
-    // Build query string with filters
-    const params = new URLSearchParams();
-    if (filters.title) params.append('title', filters.title);
-    if (filters.author) params.append('author', filters.author);
-    if (filters.genre) params.append('genre', filters.genre);
-    if (filters.year) params.append('year', filters.year);
-
-    // Navigate to search results page
-    navigate(`/search?${params.toString()}`);
+    onSearch(filters);
   };
 
   const handleReset = () => {
-    setFilters({
+    const cleared = {
       title: '',
       author: '',
       genre: '',
-      year: '',
-    });
+      startYear: '',
+      endYear: '',
+      premium: '',
+    };
+    setFilters(cleared);
+    onSearch(cleared);
   };
 
   return (
@@ -65,35 +45,35 @@ export default function SearchBar() {
         <div className="search-input-wrapper">
           <input
             type="text"
-            placeholder="Rechercher un titre..."
+            placeholder="Search by title..."
             name="title"
             value={filters.title}
             onChange={handleInputChange}
             className="search-input"
           />
           <button type="submit" className="search-btn">
-            🔍
+            Search
           </button>
         </div>
 
         <button
           type="button"
           className="filter-toggle-btn"
-          onClick={() => setShowFilters(!showFilters)}
+          onClick={() => setShowFilters((prev) => !prev)}
         >
-          Filtres {showFilters ? '▲' : '▼'}
+          Filters {showFilters ? '▲' : '▼'}
         </button>
       </form>
 
       {showFilters && (
         <div className="filters-panel">
           <div className="filter-group">
-            <label htmlFor="author">Auteur</label>
+            <label htmlFor="author">Author</label>
             <input
               type="text"
               id="author"
               name="author"
-              placeholder="Ex: Stephen King"
+              placeholder="e.g. Stephen King"
               value={filters.author}
               onChange={handleInputChange}
               className="filter-input"
@@ -109,8 +89,8 @@ export default function SearchBar() {
               onChange={handleInputChange}
               className="filter-input"
             >
-              <option value="">Tous les genres</option>
-              {genres.map(genre => (
+              <option value="">All genres</option>
+              {GENRE_OPTIONS.map((genre) => (
                 <option key={genre} value={genre}>
                   {genre}
                 </option>
@@ -119,18 +99,44 @@ export default function SearchBar() {
           </div>
 
           <div className="filter-group">
-            <label htmlFor="year">Année</label>
-            <input
-              type="number"
-              id="year"
-              name="year"
-              placeholder="Ex: 2024"
-              value={filters.year}
+            <label>Year range</label>
+            <div className="year-range">
+              <input
+                type="number"
+                name="startYear"
+                placeholder="From"
+                value={filters.startYear}
+                onChange={handleInputChange}
+                className="filter-input"
+                min="1000"
+                max={new Date().getFullYear()}
+              />
+              <input
+                type="number"
+                name="endYear"
+                placeholder="To"
+                value={filters.endYear}
+                onChange={handleInputChange}
+                className="filter-input"
+                min="1000"
+                max={new Date().getFullYear()}
+              />
+            </div>
+          </div>
+
+          <div className="filter-group">
+            <label htmlFor="premium">Premium</label>
+            <select
+              id="premium"
+              name="premium"
+              value={filters.premium}
               onChange={handleInputChange}
               className="filter-input"
-              min="1000"
-              max={new Date().getFullYear()}
-            />
+            >
+              <option value="">All</option>
+              <option value="true">Premium only</option>
+              <option value="false">Free only</option>
+            </select>
           </div>
 
           <div className="filter-actions">
@@ -139,14 +145,14 @@ export default function SearchBar() {
               className="btn-search"
               onClick={handleSearch}
             >
-              Rechercher
+              Search
             </button>
             <button
               type="button"
               className="btn-reset"
               onClick={handleReset}
             >
-              Réinitialiser
+              Reset
             </button>
           </div>
         </div>

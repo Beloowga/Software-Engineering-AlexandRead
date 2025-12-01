@@ -2,13 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Loader from '../components/Loader.jsx';
-import {
-  getGenresFromInput,
-  isValidEmail,
-  isValidGenreList,
-  getPasswordStrength,
-} from '../utils/validators.js';
+import { isValidEmail, getPasswordStrength } from '../utils/validators.js';
 import api from '../services/api.js';
+import GenreMultiSelect from '../components/GenreMultiSelect.jsx';
 
 function buildForm(profile) {
   if (!profile) {
@@ -20,7 +16,7 @@ function buildForm(profile) {
       region: '',
       favouriteBook: '',
       favouriteAuthor: '',
-      favouriteGenres: '',
+      favouriteGenres: [],
       password: '',
     };
   }
@@ -32,7 +28,7 @@ function buildForm(profile) {
     region: profile.region || '',
     favouriteBook: profile.favouriteBook || '',
     favouriteAuthor: profile.favouriteAuthor || '',
-    favouriteGenres: profile.favouriteGenres?.join(', ') || '',
+    favouriteGenres: Array.isArray(profile.favouriteGenres) ? profile.favouriteGenres : [],
     password: '',
   };
 }
@@ -70,14 +66,6 @@ export default function AccountPage() {
   const [libraryError, setLibraryError] = useState('');
 
   const emailValid = useMemo(() => isValidEmail(form.email), [form.email]);
-  const genresValid = useMemo(
-    () => isValidGenreList(form.favouriteGenres),
-    [form.favouriteGenres],
-  );
-  const genrePreview = useMemo(
-    () => getGenresFromInput(form.favouriteGenres),
-    [form.favouriteGenres],
-  );
   const passwordStrength = useMemo(
     () => getPasswordStrength(form.password),
     [form.password],
@@ -137,15 +125,15 @@ export default function AccountPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleGenresChange = (selectedGenres) => {
+    setForm((prev) => ({ ...prev, favouriteGenres: selectedGenres }));
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setStatus({ message: '', error: '' });
     if (!emailValid) {
       setStatus({ message: '', error: 'Please provide a valid email address.' });
-      return;
-    }
-    if (!genresValid) {
-      setStatus({ message: '', error: 'Separate genres with commas (no empty values).' });
       return;
     }
     setSaving(true);
@@ -225,9 +213,7 @@ export default function AccountPage() {
       <div className="account-background" />
       <div className="account-layout">
         <div className="account-actions">
-          <Link to="/" className="back-link muted-link">
-            ← Back to home page
-          </Link>
+          <Link to="/" className="back-link muted-link">Back to home page</Link>
         </div>
 
         <form className="account-grid" onSubmit={handleSubmit}>
@@ -237,9 +223,7 @@ export default function AccountPage() {
                 <img src={avatarPreview} alt="Profile avatar" className="profile-avatar__img" />
               ) : (
                 <div className="profile-avatar__circle">
-                  <span role="img" aria-hidden="true">
-                    👤
-                  </span>
+                  <span role="img" aria-hidden="true">BK</span>
                 </div>
               )}
               <span className="profile-pseudo">{displayName}</span>
@@ -250,7 +234,7 @@ export default function AccountPage() {
                   onChange={handleAvatarChange}
                   disabled={avatarUploading}
                 />
-                {avatarUploading ? 'Uploading…' : 'Change photo'}
+                {avatarUploading ? 'Uploading...' : 'Change photo'}
               </label>
               <div className="form-row profile-input">
                 <label htmlFor="pseudo">Pseudo</label>
@@ -345,27 +329,12 @@ export default function AccountPage() {
             </div>
             <div className="form-row wide">
               <label htmlFor="favouriteGenres">Favourite genres</label>
-              <input
+              <GenreMultiSelect
                 id="favouriteGenres"
-                name="favouriteGenres"
-                type="text"
                 value={form.favouriteGenres}
-                onChange={handleInputChange}
-                className={!genresValid ? 'invalid' : ''}
+                onChange={handleGenresChange}
+                placeholder="Select the genres you enjoy"
               />
-              <small>Use commas to separate each genre.</small>
-              {!genresValid && (
-                <p className="input-hint error">
-                  Separate every genre with a comma (no empty values).
-                </p>
-              )}
-              {genrePreview.length > 0 && genresValid && (
-                <div className="genre-preview">
-                  {genrePreview.map((genre) => (
-                    <span key={genre}>{genre}</span>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
@@ -410,7 +379,7 @@ export default function AccountPage() {
               <p>{libraryBooks.length === 0 ? 'Save books to build your collection.' : 'The books you love at a glance.'}</p>
             </div>
             {libraryLoading ? (
-              <p>Loading your saved books…</p>
+              <p>Loading your saved books...</p>
             ) : libraryError ? (
               <p className="status error">{libraryError}</p>
             ) : libraryBooks.length === 0 ? (
@@ -438,7 +407,7 @@ export default function AccountPage() {
             </div>
             <div className="actions-buttons">
               <button type="submit" className="primary-btn" disabled={saving}>
-                {saving ? 'Saving…' : 'Save changes'}
+                {saving ? 'Saving...' : 'Save changes'}
               </button>
               <button
                 type="button"
@@ -472,7 +441,7 @@ export default function AccountPage() {
                   onClick={handleDeleteAccount}
                   disabled={deleting}
                 >
-                  {deleting ? 'Deleting…' : 'Yes, delete'}
+                  {deleting ? 'Deleting...' : 'Yes, delete'}
                 </button>
               </div>
             </div>
@@ -482,3 +451,4 @@ export default function AccountPage() {
     </section>
   );
 }
+

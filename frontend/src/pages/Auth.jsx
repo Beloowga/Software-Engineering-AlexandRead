@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import {
-  getGenresFromInput,
-  isValidEmail,
-  isValidGenreList,
-  getPasswordStrength,
-} from '../utils/validators.js';
+import { isValidEmail, getPasswordStrength } from '../utils/validators.js';
+import GenreMultiSelect from '../components/GenreMultiSelect.jsx';
 
 const loginInitialState = {
   email: '',
@@ -22,7 +18,7 @@ const registerInitialState = {
   region: '',
   favouriteBook: '',
   favouriteAuthor: '',
-  favouriteGenres: '',
+  favouriteGenres: [],
 };
 
 export default function AuthPage() {
@@ -35,11 +31,9 @@ export default function AuthPage() {
   );
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [touched, setTouched] = useState({ email: false, favouriteGenres: false });
+  const [touched, setTouched] = useState({ email: false });
   const from = location.state?.from || '/';
   const emailValid = isValidEmail(form.email);
-  const genreListValid = isValidGenreList(form.favouriteGenres);
-  const genrePreview = getGenresFromInput(form.favouriteGenres);
   const passwordStrength = getPasswordStrength(form.password);
 
   useEffect(() => {
@@ -51,12 +45,16 @@ export default function AuthPage() {
   useEffect(() => {
     setForm(mode === 'signin' ? loginInitialState : registerInitialState);
     setError('');
-    setTouched({ email: false, favouriteGenres: false });
+    setTouched({ email: false });
   }, [mode]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleGenresChange = (selectedGenres) => {
+    setForm((prev) => ({ ...prev, favouriteGenres: selectedGenres }));
   };
 
   const setFieldTouched = (field) => {
@@ -70,13 +68,6 @@ export default function AuthPage() {
     if (!emailValid) {
       setError('Please enter a valid email address.');
       return;
-    }
-    if (mode === 'register') {
-      setFieldTouched('favouriteGenres');
-      if (!genreListValid) {
-        setError('Separate each genre with a comma (no trailing comma).');
-        return;
-      }
     }
     setLoading(true);
     try {
@@ -177,7 +168,7 @@ export default function AuthPage() {
               type="password"
               value={form.password}
               onChange={handleChange}
-              placeholder="••••••••"
+              placeholder="********"
               required
             />
             {mode === 'register' && form.password && (
@@ -206,11 +197,11 @@ export default function AuthPage() {
                 <label htmlFor="dateOfBirth">Date of birth</label>
                 <input
                   id="dateOfBirth"
-              name="dateOfBirth"
-              type="date"
-              value={form.dateOfBirth}
-              onChange={handleChange}
-            />
+                  name="dateOfBirth"
+                  type="date"
+                  value={form.dateOfBirth}
+                  onChange={handleChange}
+                />
               </div>
 
               <div className="form-row">
@@ -221,7 +212,7 @@ export default function AuthPage() {
                   type="text"
                   value={form.region}
                   onChange={handleChange}
-                  placeholder="Île-de-France"
+                  placeholder="Ile-de-France"
                 />
               </div>
 
@@ -251,29 +242,12 @@ export default function AuthPage() {
 
               <div className="form-row">
                 <label htmlFor="favouriteGenres">Favourite genres</label>
-                <input
+                <GenreMultiSelect
                   id="favouriteGenres"
-                  name="favouriteGenres"
-                  type="text"
                   value={form.favouriteGenres}
-                  onChange={handleChange}
-                  onBlur={() => setFieldTouched('favouriteGenres')}
-                  placeholder="Fantasy, Sci-Fi, Mystery"
-                  className={!genreListValid && touched.favouriteGenres ? 'invalid' : ''}
+                  onChange={handleGenresChange}
+                  placeholder="Select the genres you enjoy"
                 />
-                <small>Separate each genre with a comma.</small>
-                {touched.favouriteGenres && !genreListValid && (
-                  <p className="input-hint error">
-                    Use commas to separate each genre (no trailing commas).
-                  </p>
-                )}
-                {genrePreview.length > 0 && genreListValid && (
-                  <div className="genre-preview">
-                    {genrePreview.map((genre) => (
-                      <span key={genre}>{genre}</span>
-                    ))}
-                  </div>
-                )}
               </div>
             </>
           )}
@@ -281,7 +255,7 @@ export default function AuthPage() {
           {error && <p className="form-error">{error}</p>}
 
           <button type="submit" className="primary-btn" disabled={loading}>
-            {loading ? 'Please wait…' : mode === 'signin' ? 'Sign in' : 'Register'}
+            {loading ? 'Please wait...' : mode === 'signin' ? 'Sign in' : 'Register'}
           </button>
         </form>
       </div>

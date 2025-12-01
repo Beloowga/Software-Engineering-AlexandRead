@@ -46,10 +46,10 @@ export default function Navbar() {
     <header className="navbar">
       <div className="navbar__content">
         <Link to="/" className="brand">
-          📚 AlexandRead
+          AlexandRead
         </Link>
         <nav className="navbar__links">
-          <Link to="/">Catalogue</Link>
+          <Link to="/">Home</Link>
           {initializing ? (
             <span className="account-loading">Loading account…</span>
           ) : !user ? (

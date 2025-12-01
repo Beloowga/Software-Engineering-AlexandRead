@@ -43,14 +43,19 @@ body {
   padding: 0.85rem 1rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  position: relative;
 }
 
 .brand {
   color: var(--primary-accent);
   font-weight: 700;
   text-decoration: none;
-  font-size: 1.15rem;
+  font-size: 1.75rem;
+  font-family: 'Alice';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .navbar__links a {
@@ -58,6 +63,10 @@ body {
   margin-left: 1rem;
   text-decoration: none;
   font-weight: 500;
+}
+
+.navbar__links a:first-child {
+  margin-left: 0;
 }
 
 .navbar__links a:hover {
@@ -306,6 +315,8 @@ body {
 .navbar__links {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .auth-btn {

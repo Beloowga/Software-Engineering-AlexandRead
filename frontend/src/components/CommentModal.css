@@ -1,0 +1,179 @@
+.comment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.comment-modal {
+  background: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 500px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.comment-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+.comment-modal__header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #1e293b;
+}
+
+.comment-modal__close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #64748b;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s;
+}
+
+.comment-modal__close:hover {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #1e293b;
+}
+
+.comment-modal__form {
+  padding: 1.5rem;
+}
+
+.comment-modal__rating-section {
+  margin-bottom: 1.5rem;
+}
+
+.comment-modal__rating-section label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: #1e293b;
+}
+
+.comment-modal__stars {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.comment-modal__star {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #cbd5e1;
+  transition: color 0.2s, transform 0.1s;
+  padding: 0;
+}
+
+.comment-modal__star:hover,
+.comment-modal__star.active {
+  color: #f59e0b;
+  transform: scale(1.1);
+}
+
+.comment-modal__rating-display {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
+.comment-modal__textarea-section {
+  margin-bottom: 1.5rem;
+}
+
+.comment-modal__textarea-section label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  color: #1e293b;
+}
+
+.comment-modal__textarea {
+  width: 100%;
+  height: 120px;
+  padding: 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  border-radius: 0.5rem;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+
+.comment-modal__textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.comment-modal__char-count {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  margin: 0.5rem 0 0;
+  text-align: right;
+}
+
+.comment-modal__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.comment-modal__btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.comment-modal__btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.comment-modal__btn--delete {
+  background-color: rgba(148, 163, 184, 0.1);
+  color: #64748b;
+}
+
+.comment-modal__btn--delete:hover:not(:disabled) {
+  background-color: rgba(148, 163, 184, 0.2);
+}
+
+.comment-modal__btn--submit {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.comment-modal__btn--submit:hover:not(:disabled) {
+  background-color: #2563eb;
+}

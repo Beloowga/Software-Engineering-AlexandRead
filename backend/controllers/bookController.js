@@ -9,8 +9,8 @@ export async function getBooks(req, res) {
     .order('title');
 
   if (error) {
-    console.error('Supabase getBooks error:', error);
-    return res.status(500).json({ error: 'Database error' });
+  console.error('Supabase getBooks error:', JSON.stringify(error, null, 2));
+  return res.status(500).json({ error: 'Database error' });
   }
 
   return res.json(data);

@@ -44,16 +44,15 @@ def k_pairs(recently_read:list,k=2):
 
 def Rec_algo(user_id,k):
     recs = []
-    for elt in livres_tendances:
-        recs.append(elt)
     for elt in k_pairs(users[user_id]['recently_read'],k):
         recs.append(elt)
     for livre in bibliotheque:
-        if bibliotheque[livre]['genre'] in genres_favoris or bibliotheque[livre]['genre'] in genres_recents:
+        if bibliotheque[livre]['genre'] in genres_favoris['genres_favoris']or bibliotheque[livre]['genre'] in genres_recents:
             recs.append(livre)
         elif bibliotheque[livre]['auteur'] in auteurs_favoris or bibliotheque[livre]['auteur'] in auteurs_recents and bibliotheque[livre]['average_rating'] >= 3:
             recs.append(livre)
-    shuffle(recs)
-    return recs
+    for elt in livres_tendances:
+        recs.append(elt)
+    return set(recs)
 
-print(Rec_algo('user1',3))
+print(Rec_algo('user2',3))

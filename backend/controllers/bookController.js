@@ -16,6 +16,39 @@ export async function getBooks(req, res) {
   return res.json(data);
 }
 
+// GET /api/books/search - Search and filter books
+export async function searchBooks(req, res) {
+  const { title, author, genre, year } = req.query;
+
+  let query = supabase
+    .from('books')
+    .select('id, author, title, genre, year, summary, cover_image')
+    .order('title');
+
+  // Apply filters
+  if (title) {
+    query = query.ilike('title', `%${title}%`);
+  }
+  if (author) {
+    query = query.ilike('author', `%${author}%`);
+  }
+  if (genre) {
+    query = query.ilike('genre', `%${genre}%`);
+  }
+  if (year) {
+    query = query.eq('year', Number(year));
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Supabase searchBooks error:', error);
+    return res.status(500).json({ error: 'Database error' });
+  }
+
+  return res.json(data);
+}
+
 // GET /api/books/:id
 export async function getBookById(req, res) {
   const id = Number(req.params.id);

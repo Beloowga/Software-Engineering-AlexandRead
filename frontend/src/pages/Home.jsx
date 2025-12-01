@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../services/api.js';
 import BookCard from '../components/BookCard.jsx';
+import SearchBar from '../components/SearchBar.jsx';
 import Loader from '../components/Loader.jsx';
 
 export default function Home() {
@@ -29,6 +30,7 @@ export default function Home() {
   return (
     <div>
       <h1 className="page-title">Catalogue</h1>
+      <SearchBar />
       {books.length === 0 ? (
         <p>Aucun livre pour le moment.</p>
       ) : (

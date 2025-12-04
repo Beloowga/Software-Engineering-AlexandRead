@@ -41,6 +41,21 @@ export async function postComment(bookId, rating, comment) {
 }
 
 /**
+ * Update an existing comment
+ * @param {number} commentId - The comment ID
+ * @param {number} rating - Rating from 1 to 10
+ * @param {string} comment - The comment text (optional, max 500 chars)
+ * @returns {Promise<Object>} - The updated comment
+ */
+export async function updateCommentRequest(commentId, rating, comment) {
+  const res = await api.put(`/comments/${commentId}`, {
+    rating,
+    comment,
+  });
+  return res.data;
+}
+
+/**
  * Delete a comment
  * @param {number} commentId - The comment ID to delete
  * @returns {Promise<Object>} - Success message

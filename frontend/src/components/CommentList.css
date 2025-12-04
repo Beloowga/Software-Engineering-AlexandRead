@@ -84,26 +84,58 @@
   font-size: 0.85rem;
 }
 
-.comment-item__delete-btn {
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #94a3b8;
-  padding: 0.5rem;
-  width: 2rem;
-  height: 2rem;
+.comment-item__actions {
   display: flex;
+  gap: 0.35rem;
   align-items: center;
-  justify-content: center;
-  border-radius: 0.25rem;
-  transition: all 0.2s;
   flex-shrink: 0;
 }
 
-.comment-item__delete-btn:hover {
-  color: #e11d48;
-  background-color: rgba(225, 29, 72, 0.1);
+.comment-item__action {
+  background: rgba(28, 91, 55, 0.08);
+  border: 1px solid rgba(28, 91, 55, 0.18);
+  cursor: pointer;
+  padding: 0.4rem;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.6rem;
+  color: #1c5b37;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.comment-item__action svg {
+  width: 16px;
+  height: 16px;
+}
+
+.comment-item__action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(6, 15, 9, 0.25);
+}
+
+.comment-item__action--edit {
+  background: rgba(244, 223, 151, 0.14);
+  border-color: rgba(244, 223, 151, 0.4);
+  color: #134227;
+}
+
+.comment-item__action--edit:hover {
+  background: rgba(244, 223, 151, 0.22);
+  border-color: rgba(244, 223, 151, 0.6);
+}
+
+.comment-item__action--delete {
+  background: rgba(225, 29, 72, 0.06);
+  border-color: rgba(225, 29, 72, 0.16);
+  color: #9f1239;
+}
+
+.comment-item__action--delete:hover {
+  background: rgba(225, 29, 72, 0.12);
+  border-color: rgba(225, 29, 72, 0.32);
 }
 
 .comment-item__rating {
@@ -119,8 +151,8 @@
 }
 
 .comment-item__star {
-  color: #cbd5e1;
-  font-size: 0.95rem;
+  color: rgba(244, 223, 151, 0.7);
+  font-size: 1rem;
 }
 
 .comment-item__star.active {
@@ -147,18 +179,21 @@
 
 .comment-list__load-more {
   width: 100%;
-  padding: 0.75rem;
-  background-color: rgba(59, 130, 246, 0.05);
-  border: 1px solid rgba(59, 130, 246, 0.2);
-  border-radius: 0.5rem;
-  color: #3b82f6;
-  font-weight: 500;
+  padding: 0.85rem;
+  background: linear-gradient(135deg, rgba(244, 223, 151, 0.18), rgba(28, 91, 55, 0.1));
+  border: 1px solid rgba(28, 91, 55, 0.25);
+  border-radius: 0.85rem;
+  color: var(--primary);
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  box-shadow: 0 12px 26px rgba(6, 15, 9, 0.18);
   font-size: 0.95rem;
 }
 
 .comment-list__load-more:hover {
-  background-color: rgba(59, 130, 246, 0.1);
-  border-color: rgba(59, 130, 246, 0.3);
+  background: linear-gradient(135deg, rgba(244, 223, 151, 0.24), rgba(28, 91, 55, 0.16));
+  border-color: rgba(28, 91, 55, 0.38);
+  transform: translateY(-1px);
+  box-shadow: 0 16px 34px rgba(6, 15, 9, 0.24);
 }

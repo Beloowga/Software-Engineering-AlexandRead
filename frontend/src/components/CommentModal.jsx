@@ -1,14 +1,30 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './CommentModal.css';
 
-export default function CommentModal({ isOpen, onClose, onSubmit, isSubmitting }) {
-  const [rating, setRating] = useState(0);
+export default function CommentModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  isSubmitting,
+  title = 'Add a Comment',
+  submitLabel = 'Publish',
+  initialRating = 0,
+  initialComment = '',
+}) {
+  const [rating, setRating] = useState(initialRating);
   const [hoveredRating, setHoveredRating] = useState(0);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState(initialComment);
+
+  useEffect(() => {
+    if (isOpen) {
+      setRating(initialRating);
+      setComment(initialComment);
+    }
+  }, [isOpen, initialRating, initialComment]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (rating === 0) {
       alert('Please select a rating');
       return;
@@ -16,17 +32,16 @@ export default function CommentModal({ isOpen, onClose, onSubmit, isSubmitting }
 
     try {
       await onSubmit({ rating, comment });
-      // Reset form
-      setRating(0);
-      setComment('');
+      setRating(initialRating);
+      setComment(initialComment);
     } catch (err) {
       console.error('Error submitting comment:', err);
     }
   };
 
-  const handleDelete = () => {
-    setRating(0);
-    setComment('');
+  const handleReset = () => {
+    setRating(initialRating);
+    setComment(initialComment);
   };
 
   if (!isOpen) return null;
@@ -38,18 +53,17 @@ export default function CommentModal({ isOpen, onClose, onSubmit, isSubmitting }
     <div className="comment-modal-overlay" onClick={onClose}>
       <div className="comment-modal" onClick={(e) => e.stopPropagation()}>
         <div className="comment-modal__header">
-          <h2>Add a Comment</h2>
+          <h2>{title}</h2>
           <button
             className="comment-modal__close"
             onClick={onClose}
             aria-label="Close modal"
           >
-            ✕
+            ×
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="comment-modal__form">
-          {/* Rating Stars */}
           <div className="comment-modal__rating-section">
             <label>Your Rating</label>
             <div className="comment-modal__stars">
@@ -72,7 +86,6 @@ export default function CommentModal({ isOpen, onClose, onSubmit, isSubmitting }
             )}
           </div>
 
-          {/* Comment Textarea */}
           <div className="comment-modal__textarea-section">
             <label htmlFor="comment">Comment (Optional)</label>
             <textarea
@@ -92,11 +105,10 @@ export default function CommentModal({ isOpen, onClose, onSubmit, isSubmitting }
             </p>
           </div>
 
-          {/* Action Buttons */}
           <div className="comment-modal__actions">
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={handleReset}
               className="comment-modal__btn comment-modal__btn--delete"
               disabled={isSubmitting}
             >
@@ -107,7 +119,7 @@ export default function CommentModal({ isOpen, onClose, onSubmit, isSubmitting }
               className="comment-modal__btn comment-modal__btn--submit"
               disabled={isSubmitting || rating === 0}
             >
-              {isSubmitting ? 'Publishing...' : 'Publish'}
+              {isSubmitting ? `${submitLabel}...` : submitLabel}
             </button>
           </div>
         </form>

@@ -129,7 +129,6 @@ export default function SubscriptionPage() {
           </div>
           <ul className="subscription-benefits">
             <li>Unlimited reading across free and premium books</li>
-            <li>Keep your library synced across devices</li>
             <li>Pause or cancel anytime before renewal</li>
             <li>Auto-renew can be switched on or off</li>
           </ul>

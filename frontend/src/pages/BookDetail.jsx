@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api.js';
 import Loader from '../components/Loader.jsx';
 import { buildCoverUrl, buildBookContentUrl } from '../utils/storageUrls.js';
@@ -7,11 +7,13 @@ import SaveBookButton from '../components/SaveBookButton.jsx';
 import CommentModal from '../components/CommentModal.jsx';
 import CommentList from '../components/CommentList.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { fetchComments, fetchCommentStats, postComment, deleteCommentRequest } from '../services/comments.js';
+import { fetchComments, fetchCommentStats, postComment, deleteCommentRequest, updateCommentRequest } from '../services/comments.js';
 
 export default function BookDetail() {
   const { id } = useParams();
   const { user } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -20,6 +22,14 @@ export default function BookDetail() {
   const [commentsLoading, setCommentsLoading] = useState(false);
   const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingComment, setEditingComment] = useState(null);
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
+  const [toast, setToast] = useState({ message: '', type: 'success' });
+  const [targetCommentId, setTargetCommentId] = useState(null);
 
   useEffect(() => {
     async function fetchBook() {
@@ -57,6 +67,12 @@ export default function BookDetail() {
     loadCommentsAndStats();
   }, [book]);
 
+  useEffect(() => {
+    if (!toast.message) return;
+    const timer = setTimeout(() => setToast({ message: '', type: 'success' }), 3000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   if (loading) return <Loader />;
   if (error) return <p className="error">{error}</p>;
   if (!book) return null;
@@ -73,7 +89,7 @@ export default function BookDetail() {
 
   const handleAddComment = () => {
     if (!isLoggedIn) {
-      alert('Please log in to comment on this book');
+      navigate('/auth', { state: { from: location.pathname, mode: 'signin' } });
       return;
     }
     if (!canComment) {
@@ -94,36 +110,93 @@ export default function BookDetail() {
       setCommentStats(updatedStats);
       
       setIsCommentModalOpen(false);
-      alert('Comment published successfully!');
+      setToast({ message: 'Comment published successfully', type: 'success' });
     } catch (err) {
       console.error('Error posting comment:', err);
-      alert('Failed to publish comment. Please try again.');
+      setToast({ message: 'Failed to publish comment. Please try again.', type: 'error' });
     } finally {
       setIsSubmittingComment(false);
     }
   };
 
-  const handleDeleteComment = async (commentId) => {
-    if (!confirm('Are you sure you want to delete this comment?')) {
-      return;
-    }
+  const handleDeleteRequest = (commentId) => {
+    setDeleteTargetId(commentId);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTargetId) return;
+    setDeleteLoading(true);
     try {
-      await deleteCommentRequest(commentId);
-      setComments(comments.filter((c) => c.id !== commentId));
+      await deleteCommentRequest(deleteTargetId);
+      setComments(comments.filter((c) => c.id !== deleteTargetId));
       
       // Refresh stats
       const updatedStats = await fetchCommentStats(book.id);
       setCommentStats(updatedStats);
       
-      alert('Comment deleted successfully');
+      setToast({ message: 'Comment deleted successfully', type: 'success' });
     } catch (err) {
       console.error('Error deleting comment:', err);
-      alert('Failed to delete comment. Please try again.');
+      setToast({ message: 'Failed to delete comment. Please try again.', type: 'error' });
+    }
+    setDeleteLoading(false);
+    setDeleteConfirmOpen(false);
+    setDeleteTargetId(null);
+  };
+
+  const handleEditRequest = (comment) => {
+    setEditingComment(comment);
+    setIsEditModalOpen(true);
+  };
+
+  const handleSubmitEdit = async ({ rating, comment }) => {
+    if (!editingComment) return;
+    setIsSubmittingEdit(true);
+    try {
+      const updated = await updateCommentRequest(editingComment.id, rating, comment);
+      setComments(
+        comments.map((c) =>
+          c.id === editingComment.id ? { ...c, ...updated } : c
+        )
+      );
+
+      const updatedStats = await fetchCommentStats(book.id);
+      setCommentStats(updatedStats);
+
+      setIsEditModalOpen(false);
+      setEditingComment(null);
+      setToast({ message: 'Comment updated successfully', type: 'success' });
+    } catch (err) {
+      console.error('Error updating comment:', err);
+      setToast({ message: 'Failed to update comment. Please try again.', type: 'error' });
+    } finally {
+      setIsSubmittingEdit(false);
     }
   };
 
+  const userComment = comments.find((c) => c.user_id === user?.id);
+
+  const handleCommentButton = () => {
+    if (userComment) {
+      setTargetCommentId(userComment.id);
+      return;
+    }
+    handleAddComment();
+  };
+
+  const commentCtaLabel = userComment ? 'View your comment' : 'Add Comment';
+
   return (
     <div className="book-detail">
+      {toast.message && (
+        <div className="toast-container">
+          <div className={`toast ${toast.type === 'error' ? 'toast--error' : 'toast--success'}`}>
+            {toast.message}
+          </div>
+        </div>
+      )}
+
       <Link to="/" className="back-link">Back to previous page</Link>
 
       <div className="book-detail__head">
@@ -188,11 +261,10 @@ export default function BookDetail() {
                     Read / Download
                   </a>
                   <button
-                    onClick={handleAddComment}
-                    className="primary-btn"
-                    style={{ backgroundColor: '#10b981' }}
+                    onClick={handleCommentButton}
+                    className="primary-btn comment-btn"
                   >
-                    Add Comment
+                    {commentCtaLabel}
                   </button>
                 </>
               ) : (
@@ -210,11 +282,11 @@ export default function BookDetail() {
 
           {!contentUrl && (
             <button
-              onClick={handleAddComment}
-              className="primary-btn"
-              style={{ marginTop: '1rem', backgroundColor: '#10b981' }}
+              onClick={handleCommentButton}
+              className="primary-btn comment-btn"
+              style={{ marginTop: '1rem' }}
             >
-              Add Comment
+              {commentCtaLabel}
             </button>
           )}
         </div>
@@ -223,18 +295,7 @@ export default function BookDetail() {
       {book.summary && (
         <section className="book-detail__section">
           <h2>Summary</h2>
-          <p>{book.summary}</p>
-        </section>
-      )}
-
-      {contentUrl && contentUrl.endsWith('.pdf') && canAccessContent && (
-        <section className="book-detail__section" style={{ marginTop: '1.5rem' }}>
-          <h2>Preview</h2>
-          <iframe
-            src={contentUrl}
-            title={`Preview of ${book.title}`}
-            style={{ width: '100%', height: '500px', border: '1px solid rgba(148,163,184,0.2)', borderRadius: '0.5rem' }}
-          />
+          <p className="book-detail__summary">{book.summary}</p>
         </section>
       )}
 
@@ -254,7 +315,9 @@ export default function BookDetail() {
           ...c,
           showDelete: user?.id === c.account?.id,
         }))}
-        onDelete={handleDeleteComment}
+        onDelete={handleDeleteRequest}
+        onEdit={handleEditRequest}
+        targetCommentId={targetCommentId}
         isLoading={commentsLoading}
       />
 
@@ -265,6 +328,50 @@ export default function BookDetail() {
         onSubmit={handleSubmitComment}
         isSubmitting={isSubmittingComment}
       />
+
+      <CommentModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingComment(null);
+        }}
+        onSubmit={handleSubmitEdit}
+        isSubmitting={isSubmittingEdit}
+        title="Edit Comment"
+        submitLabel="Update"
+        initialRating={editingComment?.rating || 0}
+        initialComment={editingComment?.comment || ''}
+      />
+
+      {deleteConfirmOpen && (
+        <div className="confirm-overlay">
+          <div className="confirm-modal">
+            <h3>Delete this comment?</h3>
+            <p>This action cannot be undone.</p>
+            <div className="confirm-modal__actions">
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={() => {
+                  setDeleteConfirmOpen(false);
+                  setDeleteTargetId(null);
+                }}
+                disabled={deleteLoading}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="danger-btn"
+                onClick={handleConfirmDelete}
+                disabled={deleteLoading}
+              >
+                {deleteLoading ? 'Deleting...' : 'Yes, delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

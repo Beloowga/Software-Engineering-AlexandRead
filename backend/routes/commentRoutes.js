@@ -4,6 +4,7 @@ import {
   getCommentsByBookId,
   createComment,
   deleteComment,
+  updateComment,
 } from '../controllers/commentController.js';
 import { requireAuth } from '../middleware/authMiddleware.js';
 
@@ -17,6 +18,9 @@ router.get('/book/:bookId', getCommentsByBookId);
 
 // POST a new comment - requires authentication
 router.post('/', requireAuth, createComment);
+
+// UPDATE a comment - requires authentication
+router.put('/:commentId', requireAuth, updateComment);
 
 // DELETE a comment - requires authentication
 router.delete('/:commentId', requireAuth, deleteComment);

@@ -237,6 +237,10 @@ body {
   margin-bottom: .5rem;
 }
 
+.book-detail__summary {
+  white-space: pre-line;
+}
+
 .book-detail__section iframe {
   background: rgba(23, 35, 18, 0.15);
 }
@@ -296,6 +300,17 @@ body {
 .primary-btn:not(:disabled):hover {
   transform: translateY(-1px);
   box-shadow: 0 12px 30px rgba(6, 15, 9, 0.4);
+}
+
+.primary-btn.comment-btn {
+  background: linear-gradient(135deg, #1c5b37, #134227);
+  color: var(--primary-accent);
+  border: 1px solid rgba(244, 223, 151, 0.35);
+  box-shadow: 0 14px 30px rgba(6, 15, 9, 0.45);
+}
+
+.primary-btn.comment-btn:hover {
+  box-shadow: 0 18px 40px rgba(6, 15, 9, 0.5);
 }
 
 .primary-btn.secondary {
@@ -821,6 +836,42 @@ body {
   display: flex;
   gap: 0.7rem;
   justify-content: flex-end;
+}
+
+.toast-container {
+  position: fixed;
+  top: 76px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.toast {
+  min-width: 280px;
+  max-width: 480px;
+  padding: 0.85rem 1.2rem;
+  border-radius: 14px;
+  background: rgba(244, 223, 151, 0.95);
+  color: #0d1b11;
+  border: 1px solid rgba(244, 223, 151, 0.6);
+  box-shadow: 0 18px 40px rgba(6, 15, 9, 0.35);
+  font-weight: 700;
+  text-align: center;
+}
+
+.toast.toast--success {
+  background: linear-gradient(135deg, rgba(28, 91, 55, 0.18), rgba(244, 223, 151, 0.95));
+  border-color: rgba(28, 91, 55, 0.35);
+  color: #0d1b11;
+}
+
+.toast.toast--error {
+  background: rgba(159, 18, 57, 0.1);
+  border-color: rgba(159, 18, 57, 0.35);
+  color: #5f0f25;
 }
 
 .ghost-btn {

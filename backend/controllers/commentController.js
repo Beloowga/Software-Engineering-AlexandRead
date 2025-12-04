@@ -217,3 +217,73 @@ export async function deleteComment(req, res) {
     res.status(500).json({ error: 'Server error' });
   }
 }
+
+// Update an existing comment
+export async function updateComment(req, res) {
+  const userId = req.auth?.userId;
+  const { commentId } = req.params;
+  const { rating, comment } = req.body;
+
+  if (!userId) {
+    return res.status(401).json({ error: 'User not authenticated' });
+  }
+
+  if (rating !== undefined) {
+    const parsedRating = Number(rating);
+    if (!Number.isInteger(parsedRating) || parsedRating < 1 || parsedRating > 10) {
+      return res.status(400).json({ error: 'Rating must be an integer between 1 and 10' });
+    }
+  }
+
+  if (comment && comment.length > 500) {
+    return res.status(400).json({ error: 'Comment must not exceed 500 characters' });
+  }
+
+  try {
+    // Ensure the comment exists and belongs to the user
+    const { data: existingComment, error: fetchError } = await supabase
+      .from('comments')
+      .select('id, user_id, book_id')
+      .eq('id', commentId)
+      .single();
+
+    if (fetchError || !existingComment) {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+
+    if (existingComment.user_id !== userId) {
+      return res.status(403).json({ error: 'You can only edit your own comments' });
+    }
+
+    const updates = {};
+    if (rating !== undefined) updates.rating = rating;
+    if (comment !== undefined) updates.comment = comment || null;
+
+    const { data: updated, error: updateError } = await supabase
+      .from('comments')
+      .update(updates)
+      .eq('id', commentId)
+      .select('*')
+      .single();
+
+    if (updateError) {
+      console.error('Error updating comment:', updateError);
+      return res.status(400).json({ error: 'Failed to update comment' });
+    }
+
+    // Attach user info for frontend
+    const { data: userData } = await supabase
+      .from('account')
+      .select('id, name, email, avatar_url')
+      .eq('id', userId)
+      .single();
+
+    res.json({
+      ...updated,
+      account: userData || { id: userId },
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+}

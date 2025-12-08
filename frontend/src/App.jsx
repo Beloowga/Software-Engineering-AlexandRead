@@ -6,6 +6,7 @@ import SearchResults from './pages/SearchResults.jsx';
 import AuthPage from './pages/Auth.jsx';
 import AccountPage from './pages/Account.jsx';
 import SubscriptionPage from './pages/Subscription.jsx';
+import AdminDashboard from './pages/AdminDashboard.jsx';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/subscription" element={<SubscriptionPage />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </main>
     </div>

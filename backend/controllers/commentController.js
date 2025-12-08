@@ -287,3 +287,154 @@ export async function updateComment(req, res) {
     res.status(500).json({ error: 'Server error' });
   }
 }
+
+// Admin: list comments with user and book info
+export async function adminListComments(req, res) {
+  const limit = Math.min(Number(req.query.limit) || 50, 100);
+  const offset = Number(req.query.offset) || 0;
+  const bookId = req.query.bookId ? Number(req.query.bookId) : null;
+
+  try {
+    let query = supabase
+      .from('comments')
+      .select('*', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (bookId) {
+      query = query.eq('book_id', bookId);
+    }
+
+    const { data: comments, error, count } = await query;
+
+    if (error) {
+      console.error('[adminListComments] fetch error:', error);
+      return res.status(500).json({ error: 'Unable to load comments.' });
+    }
+
+    const userIds = Array.from(new Set((comments || []).map((c) => c.user_id).filter(Boolean)));
+    const bookIds = Array.from(new Set((comments || []).map((c) => c.book_id).filter(Boolean)));
+
+    const [userRes, bookRes] = await Promise.all([
+      userIds.length
+        ? supabase
+          .from('account')
+          .select('id, email, pseudo, name, avatar_url')
+          .in('id', userIds)
+        : { data: [] },
+      bookIds.length
+        ? supabase
+          .from('books')
+          .select('id, title, author')
+          .in('id', bookIds)
+        : { data: [] },
+    ]);
+
+    const userMap = new Map((userRes.data || []).map((u) => [u.id, u]));
+    const bookMap = new Map((bookRes.data || []).map((b) => [b.id, b]));
+
+    const enriched = (comments || []).map((c) => ({
+      ...c,
+      account: userMap.get(c.user_id) || null,
+      book: bookMap.get(c.book_id) || null,
+    }));
+
+    return res.json({ comments: enriched, total: count ?? enriched.length });
+  } catch (err) {
+    console.error('[adminListComments] unexpected error:', err);
+    return res.status(500).json({ error: 'Server error while listing comments.' });
+  }
+}
+
+// Admin: update comment regardless of owner
+export async function adminUpdateComment(req, res) {
+  const commentId = Number(req.params.id);
+  if (!commentId) {
+    return res.status(400).json({ error: 'Invalid comment id.' });
+  }
+
+  const { rating, comment } = req.body || {};
+  const updates = {};
+
+  if (typeof rating !== 'undefined') {
+    const parsed = Number(rating);
+    if (!Number.isInteger(parsed) || parsed < 1 || parsed > 10) {
+      return res.status(400).json({ error: 'Rating must be an integer between 1 and 10.' });
+    }
+    updates.rating = parsed;
+  }
+
+  if (typeof comment !== 'undefined') {
+    if (comment && comment.length > 500) {
+      return res.status(400).json({ error: 'Comment must not exceed 500 characters.' });
+    }
+    updates.comment = comment ? comment : null;
+  }
+
+  if (Object.keys(updates).length === 0) {
+    return res.status(400).json({ error: 'No fields provided for update.' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .update(updates)
+      .eq('id', commentId)
+      .select('*')
+      .maybeSingle();
+
+    if (error) {
+      console.error('[adminUpdateComment] update error:', error);
+      return res.status(500).json({ error: 'Failed to update comment.' });
+    }
+
+    if (!data) {
+      return res.status(404).json({ error: 'Comment not found.' });
+    }
+
+    const [userRes, bookRes] = await Promise.all([
+      supabase.from('account').select('id, email, pseudo, name, avatar_url').eq('id', data.user_id).maybeSingle(),
+      supabase.from('books').select('id, title, author').eq('id', data.book_id).maybeSingle(),
+    ]);
+
+    return res.json({
+      ...data,
+      account: userRes?.data || null,
+      book: bookRes?.data || null,
+    });
+  } catch (err) {
+    console.error('[adminUpdateComment] unexpected error:', err);
+    return res.status(500).json({ error: 'Server error while updating comment.' });
+  }
+}
+
+// Admin: delete comment
+export async function adminDeleteComment(req, res) {
+  const commentId = Number(req.params.id);
+  if (!commentId) {
+    return res.status(400).json({ error: 'Invalid comment id.' });
+  }
+
+  try {
+    const { data, error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', commentId)
+      .select('id')
+      .maybeSingle();
+
+    if (error) {
+      console.error('[adminDeleteComment] delete error:', error);
+      return res.status(500).json({ error: 'Failed to delete comment.' });
+    }
+
+    if (!data) {
+      return res.status(404).json({ error: 'Comment not found.' });
+    }
+
+    return res.status(204).send();
+  } catch (err) {
+    console.error('[adminDeleteComment] unexpected error:', err);
+    return res.status(500).json({ error: 'Server error while deleting comment.' });
+  }
+}

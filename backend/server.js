@@ -8,6 +8,7 @@ import accountRoutes from './routes/accountRoutes.js';
 import savedBookRoutes from './routes/savedBookRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use('/api/account', accountRoutes);
 app.use('/api/account/saved', savedBookRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/admin', adminRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

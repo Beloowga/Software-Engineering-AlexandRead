@@ -9,6 +9,8 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const isSubscribed = Boolean(user?.subscription?.isActive);
+  const isAdmin = (user?.role || '').toString().toLowerCase() === 'admin';
+  const isAdminMode = isAdmin || location.pathname.startsWith('/admin');
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -31,7 +33,7 @@ export default function Navbar() {
 
   const handleAccountDetails = () => {
     setOpen(false);
-    navigate('/account');
+    navigate(isAdmin ? '/admin' : '/account');
   };
 
   const handleLogout = () => {
@@ -70,17 +72,20 @@ export default function Navbar() {
             <span>Home</span>
           </Link>
           <div className="navbar__actions">
-            <Link
-              to="/subscription"
-              className={`subscription-link ${isSubscribed ? 'is-active' : ''}`}
-            >
-              <span className="subscription-icon" aria-hidden="true">
-                {isSubscribed ? '👑' : '+'}
-              </span>
-              <span>{isSubscribed ? 'Premium' : 'Subscribe'}</span>
-            </Link>
+            {!isAdminMode && (
+              <Link
+                to="/subscription"
+                className={`subscription-link ${isSubscribed ? 'is-active' : ''}`}
+              >
+                <span className="subscription-icon" aria-hidden="true">
+                  {isSubscribed ? '👑' : '+'}
+                </span>
+                <span>{isSubscribed ? 'Premium' : 'Subscribe'}</span>
+              </Link>
+            )}
+            {isAdmin && <span className="admin-chip">Admin mode</span>}
             {initializing ? (
-              <span className="account-loading">Loading account…</span>
+              <span className="account-loading">Loading accountƒ?İ</span>
             ) : !user ? (
               <button type="button" className="auth-btn" onClick={handleAuthNavigation}>
                 Sign In / Register
@@ -104,7 +109,7 @@ export default function Navbar() {
                 {open && (
                   <div className="account-dropdown">
                     <button type="button" onClick={handleAccountDetails}>
-                      View account details
+                      {isAdmin ? 'Open admin interface' : 'View account details'}
                     </button>
                     <button type="button" onClick={handleLogout}>
                       Disconnect

@@ -5,6 +5,7 @@ import Loader from '../components/Loader.jsx';
 import { isValidEmail, getPasswordStrength } from '../utils/validators.js';
 import api from '../services/api.js';
 import GenreMultiSelect from '../components/GenreMultiSelect.jsx';
+import { fetchCurrentReading } from '../services/reading.js';
 
 function buildForm(profile) {
   if (!profile) {
@@ -64,6 +65,9 @@ export default function AccountPage() {
   const [libraryBooks, setLibraryBooks] = useState([]);
   const [libraryLoading, setLibraryLoading] = useState(false);
   const [libraryError, setLibraryError] = useState('');
+  const [readingEntries, setReadingEntries] = useState([]);
+  const [readingLoading, setReadingLoading] = useState(false);
+  const [readingError, setReadingError] = useState('');
 
   const emailValid = useMemo(() => isValidEmail(form.email), [form.email]);
   const passwordStrength = useMemo(
@@ -193,6 +197,46 @@ export default function AccountPage() {
 
   const displayName = user.pseudo || user.name || user.email;
 
+  const formatDate = (value) => {
+    if (!value) return '—';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return value;
+    return parsed.toLocaleDateString();
+  };
+
+  useEffect(() => {
+    let ignore = false;
+    async function loadReading() {
+      if (!user) {
+        if (!ignore) {
+          setReadingEntries([]);
+          setReadingError('');
+        }
+        return;
+      }
+      setReadingLoading(true);
+      setReadingError('');
+      try {
+        const entries = await fetchCurrentReading();
+        if (!ignore) {
+          setReadingEntries(entries);
+        }
+      } catch (err) {
+        if (!ignore) {
+          setReadingError('Unable to load your current reads.');
+        }
+      } finally {
+        if (!ignore) {
+          setReadingLoading(false);
+        }
+      }
+    }
+    loadReading();
+    return () => {
+      ignore = true;
+    };
+  }, [user]);
+
   const handleDeleteAccount = async () => {
     setStatus({ message: '', error: '' });
     setDeleting(true);
@@ -228,7 +272,7 @@ export default function AccountPage() {
               )}
               <span className="profile-pseudo">
                 {displayName}
-                {user?.subscription?.isActive && <span className="subscription-badge">PRO</span>}
+                {user?.subscription?.isActive && <span className="subscription-badge">Premium</span>}
               </span>
               <label className={`upload-btn ${avatarUploading ? 'disabled' : ''}`}>
                 <input
@@ -376,9 +420,47 @@ export default function AccountPage() {
             </div>
           </div>
 
+          <div className="account-card reading-card">
+            <div className="library-head">
+              <h2>Currently reading</h2>
+              <p>Books you have started and can finish later.</p>
+            </div>
+            {readingLoading ? (
+              <p>Loading your reading activity...</p>
+            ) : readingError ? (
+              <p className="status error">{readingError}</p>
+            ) : readingEntries.length === 0 ? (
+              <p className="status">Start reading a book to see it here.</p>
+            ) : (
+              <div className="library-tiles reading-tiles">
+                {readingEntries.map((entry) => {
+                  const book = entry.book || {};
+                  const targetId = book.id || entry.book_id;
+                  if (!targetId) return null;
+                  const key = `${entry.book_id}-${entry.start_read_date || 'start'}`;
+                  return (
+                    <Link
+                      key={key}
+                      to={`/books/${targetId}`}
+                      className="library-book reading-book"
+                    >
+                      <span className="library-book__title">{book.title || 'Unknown title'}</span>
+                      <span className="library-book__author">
+                        {book.author || 'Unknown author'}
+                      </span>
+                      <span className="reading-meta">
+                        Started {formatDate(entry.start_read_date)}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
           <div className="account-card library-card">
             <div className="library-head">
-              <h2>My Library:</h2>
+              <h2>Saved books for later</h2>
               <p>{libraryBooks.length === 0 ? 'Save books to build your collection.' : 'The books you love at a glance.'}</p>
             </div>
             {libraryLoading ? (

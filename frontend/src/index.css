@@ -349,6 +349,17 @@ body {
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
 }
 
+.finish-btn {
+  background: linear-gradient(135deg, #0f3f26, #0b281a);
+  border: 1px solid rgba(244, 223, 151, 0.55);
+  color: #f4df97;
+}
+
+.finish-btn:hover:not(:disabled) {
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+  transform: translateY(-1px);
+}
+
 .primary-btn.subscribe-cta {
   background: #0d3b23;
   color: #f4df97;
@@ -919,6 +930,7 @@ body {
     "profile details"
     "profile favourites"
     "profile security"
+    "reading reading"
     "library library"
     "actions actions";
 }
@@ -1128,6 +1140,23 @@ body {
   font-size: 0.9rem;
 }
 
+.reading-tiles {
+  align-items: stretch;
+}
+
+.reading-book {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  justify-content: space-between;
+}
+
+.reading-meta {
+  font-size: 0.85rem;
+  color: rgba(23, 35, 18, 0.8);
+  font-weight: 600;
+}
+
 .profile-card {
   grid-area: profile;
 }
@@ -1143,6 +1172,10 @@ body {
 .security-card {
   grid-area: security;
   z-index: 4;
+}
+
+.reading-card {
+  grid-area: reading;
 }
 
 .library-card {
@@ -1162,6 +1195,7 @@ body {
       "details"
       "favourites"
       "security"
+      "reading"
       "library"
       "actions";
   }

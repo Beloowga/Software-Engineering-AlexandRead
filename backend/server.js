@@ -9,6 +9,7 @@ import savedBookRoutes from './routes/savedBookRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import readingRoutes from './routes/readingRoutes.js';
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use('/api/books', bookRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/account', accountRoutes);
 app.use('/api/account/saved', savedBookRoutes);
+app.use('/api/account/reading', readingRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/admin', adminRoutes);

@@ -138,6 +138,8 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  position: relative;
+  z-index: 0;
 }
 
 .book-card__image .premium-badge {
@@ -152,10 +154,44 @@ body {
   font-size: 0.9rem;
 }
 
-.book-card__image .save-btn {
+.book-card__actions {
   position: absolute;
   top: 0.65rem;
   right: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  z-index: 60;
+}
+
+.book-card__actions .save-btn,
+.book-card__actions .read-btn {
+  position: static;
+  z-index: 61;
+}
+
+/* Ensure action buttons always receive pointer events and show pointer cursor */
+.book-card__actions button,
+.save-btn,
+.read-btn {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+.book-card__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  background-color: #fef3c7;
+  border-radius: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.book-card__rating-star {
+  color: #f59e0b;
 }
 
 .book-card__body {
@@ -372,6 +408,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  pointer-events: auto;
 }
 
 .save-btn svg {
@@ -398,6 +435,46 @@ body {
 }
 
 .save-btn--card {
+  padding: 0.3rem;
+}
+
+.read-btn {
+  border: none;
+  background: rgba(7, 18, 12, 0.55);
+  border-radius: 999px;
+  padding: 0.35rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+  pointer-events: auto;
+}
+
+.read-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.read-btn.is-read {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+.read-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.read-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+}
+
+.read-btn--detail {
+  padding: 0.45rem;
+}
+
+.read-btn--card {
   padding: 0.3rem;
 }
 
@@ -920,6 +997,7 @@ body {
     "profile favourites"
     "profile security"
     "library library"
+    "read read"
     "actions actions";
 }
 
@@ -1147,6 +1225,10 @@ body {
 
 .library-card {
   grid-area: library;
+}
+
+.read-card {
+  grid-area: read;
 }
 
 .account-actions.wide {

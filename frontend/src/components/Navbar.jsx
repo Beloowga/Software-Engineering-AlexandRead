@@ -48,9 +48,6 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar__content">
-        <Link to="/" className="brand">
-          AlexandRead
-        </Link>
         <nav className="navbar__links">
           <Link to="/" className="home-link">
             <svg
@@ -71,7 +68,40 @@ export default function Navbar() {
             </svg>
             <span>Home</span>
           </Link>
-          <div className="navbar__actions">
+          <Link
+            to="/activity"
+            className="home-link activity-link"
+            onClick={(event) => {
+              if (!user) {
+                event.preventDefault();
+                navigate('/auth', { state: { from: location.pathname, mode: 'signin' } });
+              }
+            }}
+          >
+            <svg
+              aria-hidden="true"
+              focusable="false"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 4h14v3H5z" />
+              <path d="M5 10h14v10H5z" />
+              <path d="M9 10v10" />
+              <path d="M15 10v10" />
+            </svg>
+            <span>My activity</span>
+          </Link>
+        </nav>
+        <Link to="/" className="brand">
+          AlexandRead
+        </Link>
+        <div className="navbar__actions">
             {!isAdminMode && (
               <Link
                 to="/subscription"
@@ -118,8 +148,7 @@ export default function Navbar() {
                 )}
               </div>
             )}
-          </div>
-        </nav>
+        </div>
       </div>
     </header>
   );

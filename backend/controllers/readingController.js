@@ -52,6 +52,45 @@ export async function listCurrentReading(req, res) {
   return res.json({ entries: data || [] });
 }
 
+export async function listReadingHistory(req, res) {
+  if (!ensureTableConfigured(res)) return;
+
+  const userId = req.auth?.userId;
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required.' });
+  }
+
+  const { data, error } = await supabase
+    .from(READING_TABLE)
+    .select(`
+      user_id,
+      book_id,
+      start_read_date,
+      end_read_date,
+      is_finished,
+      book:books (
+        id,
+        title,
+        author,
+        cover_image,
+        genre,
+        year,
+        premium
+      )
+    `)
+    .eq('user_id', userId)
+    .or('is_finished.eq.true,end_read_date.not.is.null')
+    .order('end_read_date', { ascending: false, nullsFirst: false })
+    .order('start_read_date', { ascending: false });
+
+  if (error) {
+    console.error('[readingController] listReadingHistory error:', error);
+    return res.status(500).json({ error: 'Unable to load reading history.' });
+  }
+
+  return res.json({ entries: data || [] });
+}
+
 export async function getReadingStatus(req, res) {
   if (!ensureTableConfigured(res)) return;
 

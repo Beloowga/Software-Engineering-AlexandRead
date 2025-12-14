@@ -5,6 +5,11 @@ export async function fetchCurrentReading() {
   return data.entries || [];
 }
 
+export async function fetchReadingHistory() {
+  const { data } = await api.get('/account/reading/history');
+  return data.entries || [];
+}
+
 export async function fetchReadingStatus(bookId) {
   const { data } = await api.get(`/account/reading/${bookId}`);
   return data.entry || null;

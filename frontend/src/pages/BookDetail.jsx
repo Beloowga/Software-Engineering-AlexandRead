@@ -4,7 +4,6 @@ import api from '../services/api.js';
 import Loader from '../components/Loader.jsx';
 import { buildCoverUrl, buildBookContentUrl } from '../utils/storageUrls.js';
 import SaveBookButton from '../components/SaveBookButton.jsx';
-import MarkAsReadButton from '../components/MarkAsReadButton.jsx';
 import CommentModal from '../components/CommentModal.jsx';
 import CommentList from '../components/CommentList.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -306,7 +305,6 @@ export default function BookDetail() {
             </div>
             {isPremium && <span className="premium-badge">Premium</span>}
             <SaveBookButton bookId={book.id} variant="detail" />
-            <MarkAsReadButton bookId={book.id} variant="detail" />
           </div>
           <p className="book-detail__author">{book.author}</p>
           <p className="book-detail__meta">

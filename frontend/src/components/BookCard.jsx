@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { buildCoverUrl } from '../utils/storageUrls.js';
 import SaveBookButton from './SaveBookButton.jsx';
-import MarkAsReadButton from './MarkAsReadButton.jsx';
 import { fetchCommentStats } from '../services/comments.js';
 
 export default function BookCard({ book }) {
@@ -44,7 +43,6 @@ export default function BookCard({ book }) {
               <span className="book-card__rating-value">{stats.averageRating}</span>
             </div>
           )}
-          <MarkAsReadButton bookId={id} variant="card" />
           <SaveBookButton bookId={id} variant="card" />
         </div>
         {imgUrl ? (

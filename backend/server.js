@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import bookRoutes from './routes/bookRoutes.js';
+import recommendationRoutes from './routes/recommendationRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import accountRoutes from './routes/accountRoutes.js';
 import savedBookRoutes from './routes/savedBookRoutes.js';
@@ -21,6 +22,9 @@ app.use(express.json({ limit: '6mb' }));
 app.get('/', (req, res) => {
   res.send('Backend API is running');
 });
+
+//Recommendation routes API
+app.use('/api/recommendations',recommendationRoutes);
 
 // routes API
 app.use('/api/books', bookRoutes);

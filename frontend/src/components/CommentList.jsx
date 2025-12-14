@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { buildCoverUrl } from '../utils/storageUrls.js';
-import './CommentList.css';
+import '../styles/components/CommentList.css';
 
 export default function CommentList({ comments, onDelete, onEdit, isLoading, targetCommentId = null }) {
   const [displayedComments, setDisplayedComments] = useState(comments.slice(0, 3));

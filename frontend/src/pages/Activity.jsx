@@ -206,7 +206,7 @@ export default function ActivityPage() {
       <div className="account-background" />
       <div className="account-layout activity-layout">
         <div className="account-actions activity-actions">
-          <h1 className="page-title" style={{ margin: 0 }}>My activity</h1>
+          <h1 className="page-title activity-title">My activity</h1>
           <Link to="/" className="back-link muted-link activity-back-link">Back to previous page</Link>
         </div>
 

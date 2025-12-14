@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import './CommentModal.css';
+import '../styles/components/CommentModal.css';
 
 export default function CommentModal({
   isOpen,

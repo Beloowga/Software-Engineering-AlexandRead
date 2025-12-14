@@ -489,7 +489,7 @@ export default function AdminDashboard() {
                       ref={coverInputRef}
                       type="file"
                       accept="image/*"
-                      style={{ display: 'none' }}
+                      className="admin-hidden-input"
                       onChange={(e) => handleFileUpload(e, 'cover')}
                     />
                   </div>
@@ -521,10 +521,9 @@ export default function AdminDashboard() {
                     )}
                     <input
                       ref={bookInputRef}
-                      className="admin-input"
+                      className="admin-input admin-hidden-input"
                       type="file"
                       accept=".pdf,application/pdf"
-                      style={{ display: 'none' }}
                       onChange={(e) => handleFileUpload(e, 'book')}
                     />
                   </div>
@@ -545,7 +544,7 @@ export default function AdminDashboard() {
             <div className="admin-list__header">
               <div>
                 <h3>Current catalog</h3>
-                <p className="muted" style={{ marginTop: '0.2rem' }}>Search by title, author or genre.</p>
+                <p className="muted admin-search-hint">Search by title, author or genre.</p>
               </div>
               <div className="admin-list__tools">
                 <input
@@ -599,7 +598,7 @@ export default function AdminDashboard() {
           </div>
 
           <div className="form-row">
-            <label style={{ flex: 1 }}>
+            <label className="admin-flex-1">
               Search comments
               <input
                 type="text"

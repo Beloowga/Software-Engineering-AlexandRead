@@ -1,96 +1,3 @@
-:root {
-  --bg: #07180f;
-  --bg-alt: #0d2c19;
-  --surface: #f4df97;
-  --surface-muted: #f9edc4;
-  --surface-dark: #13331e;
-  --primary: #1c5b37;
-  --primary-accent: #f5eec2;
-  --text-light: #ecf5e7;
-  --text-dark: #172312;
-  --text: #ecf5e7;
-  --muted: #819381;
-  --radius: 16px;
-  --gap: 1rem;
-  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  background: var(--bg);
-  color: var(--text-light);
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: radial-gradient(circle at top, #12361f, #06170f 60%);
-  color: var(--text-light);
-}
-
-.app {
-  min-height: 100vh;
-}
-
-.navbar {
-  background: rgba(7, 24, 15, 0.85);
-  border-bottom: 1px solid rgba(245, 238, 194, 0.2);
-  backdrop-filter: blur(4px);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.navbar__content {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 0.85rem 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-  gap: 1rem;
-}
-
-.brand {
-  color: var(--primary-accent);
-  font-weight: 700;
-  text-decoration: none;
-  font-size: 1.75rem;
-  font-family: 'Alice';
-  position: static;
-}
-
-.admin-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.35rem 0.65rem;
-  border-radius: 999px;
-  background: linear-gradient(120deg, rgba(244, 223, 151, 0.15), rgba(244, 223, 151, 0.05));
-  color: var(--primary-accent);
-  border: 1px solid rgba(244, 223, 151, 0.4);
-  font-weight: 700;
-}
-
-.admin-chip::before {
-  content: '';
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #32e28a;
-  box-shadow: 0 0 0 4px rgba(50, 226, 138, 0.2);
-}
-
-.container {
-  max-width: 1100px;
-  margin: 1.5rem auto;
-  padding: 0 1rem 3rem;
-}
-
-.page-title {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 1.2rem;
-  color: var(--primary-accent);
-}
-
 .books-grid {
   display: grid;
   gap: 1.8rem;
@@ -595,7 +502,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
-  z-index: 12;
+  z-index: 120;
 }
 
 .account-dropdown button {

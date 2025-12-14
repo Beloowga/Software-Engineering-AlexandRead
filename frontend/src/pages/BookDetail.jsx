@@ -281,23 +281,15 @@ export default function BookDetail() {
 
         <div className="book-detail__meta-col">
           <div className="book-detail__title-row">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <div className="book-detail__title-meta">
               <h1>{book.title}</h1>
               {commentStats.averageRating !== null && (
-                <div style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '0.5rem',
-                  padding: '0.5rem 1rem',
-                  backgroundColor: '#fef3c7',
-                  borderRadius: '0.5rem',
-                  whiteSpace: 'nowrap'
-                }}>
-                  <span style={{ fontSize: '1.25rem', color: '#f59e0b' }}>★</span>
-                  <span style={{ fontWeight: '600', color: '#1e293b' }}>
+                <div className="book-detail__rating-badge">
+                  <span className="book-detail__rating-star">★</span>
+                  <span className="book-detail__rating-score">
                     {commentStats.averageRating}/10
                   </span>
-                  <span style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                  <span className="book-detail__rating-count">
                     ({commentStats.totalComments})
                   </span>
                 </div>
@@ -312,22 +304,21 @@ export default function BookDetail() {
           </p>
 
           {contentUrl && (
-            <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
+            <div className="book-detail__cta-stack">
               {canAccessContent ? (
                 <>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'nowrap' }}>
+                  <div className="book-detail__cta-row">
                     <a
                       href={contentUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="primary-btn"
-                      style={{ display: 'inline-flex' }}
+                      className="primary-btn book-detail__download"
                       onClick={handleLogStart}
                     >
                       Read / Download
                     </a>
                     {isReading && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'nowrap' }}>
+                      <div className="book-detail__reading-meta">
                         <button
                           onClick={handleFinishReading}
                           className="primary-btn finish-btn"
@@ -336,19 +327,19 @@ export default function BookDetail() {
                           {readingActionLoading ? 'Saving...' : 'Mark as finished'}
                         </button>
                         {readingStartLabel && (
-                          <span style={{ color: '#1d2b1a', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                          <span className="book-detail__reading-start">
                             Started on {readingStartLabel}
                           </span>
                         )}
                       </div>
                     )}
                     {!isReading && readingEndLabel && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'nowrap' }}>
-                        <span style={{ color: '#1d2b1a', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                      <div className="book-detail__reading-meta">
+                        <span className="book-detail__reading-start">
                           Finished on {readingEndLabel}
                         </span>
                         {readingStartLabel && (
-                          <span style={{ color: '#334155', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                          <span className="book-detail__reading-start book-detail__reading-start--secondary">
                             Started on {readingStartLabel}
                           </span>
                         )}
@@ -378,8 +369,7 @@ export default function BookDetail() {
           {!contentUrl && (
             <button
               onClick={handleCommentButton}
-              className="primary-btn comment-btn"
-              style={{ marginTop: '1rem' }}
+              className="primary-btn comment-btn book-detail__comment-cta"
             >
               {commentCtaLabel}
             </button>

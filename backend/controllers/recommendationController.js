@@ -1,7 +1,11 @@
 import { supabase } from '../db.js';
 
 export async function getRecommendations(req, res) {
-  const userId = Number(req.params.userId);
+  const userId = Number(req.auth?.userId);
+  if (!userId) {
+    return res.status(401).json({ error: 'Authentication required.' });
+  }
+
   const LIMIT = 5; // How many books per category
   
   try {
@@ -37,16 +41,33 @@ export async function getRecommendations(req, res) {
     }
 
     // --- B. CONTENT-BASED FILTERING (Supabase Query) ---
-    // Match favorite author OR favorite genres
-    if (userProfile) {
-      const { data: contentData } = await supabase
+    // Match favorite author OR favorite genres (safely handle empty preferences)
+    const genres = Array.isArray(userProfile?.favourite_genres) ? userProfile.favourite_genres : [];
+    const favouriteAuthor = (userProfile?.favourite_author || '').trim();
+
+    if (favouriteAuthor) {
+      const { data: authorMatches, error: authorError } = await supabase
         .from('books')
         .select('id')
-        .or(`author.eq.${userProfile.favourite_author},genre.in.(${userProfile.favourite_genres.join(',')})`)
+        .eq('author', favouriteAuthor)
         .limit(LIMIT);
 
-      if (contentData) {
-        contentData.forEach(row => {
+      if (!authorError && authorMatches) {
+        authorMatches.forEach(row => {
+          if (!readBookIds.has(row.id)) recommendedIds.add(row.id);
+        });
+      }
+    }
+
+    if (genres.length > 0) {
+      const { data: genreMatches, error: genreError } = await supabase
+        .from('books')
+        .select('id')
+        .in('genre', genres)
+        .limit(LIMIT);
+
+      if (!genreError && genreMatches) {
+        genreMatches.forEach(row => {
           if (!readBookIds.has(row.id)) recommendedIds.add(row.id);
         });
       }

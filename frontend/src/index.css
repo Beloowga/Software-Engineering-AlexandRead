@@ -839,6 +839,50 @@ body {
   font-weight: 700;
 }
 
+.activity-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.activity-shell {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.activity-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.activity-nav {
+  position: sticky;
+  top: 90px;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.activity-nav button {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 238, 194, 0.35);
+  background: rgba(20, 61, 36, 0.4);
+  color: var(--primary-accent);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 140ms ease, background 140ms ease;
+}
+
+.activity-nav button:hover {
+  background: rgba(28, 91, 55, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.3);
+}
+
 .account-actions.wide {
   justify-content: space-between;
   align-items: flex-start;

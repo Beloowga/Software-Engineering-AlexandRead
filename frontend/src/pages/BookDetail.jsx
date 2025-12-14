@@ -9,6 +9,11 @@ import CommentModal from '../components/CommentModal.jsx';
 import CommentList from '../components/CommentList.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { fetchComments, fetchCommentStats, postComment, deleteCommentRequest, updateCommentRequest } from '../services/comments.js';
+import {
+  fetchReadingStatus,
+  startReading as logStartReading,
+  finishReading as logFinishReading,
+} from '../services/reading.js';
 
 export default function BookDetail() {
   const { id } = useParams();
@@ -31,6 +36,8 @@ export default function BookDetail() {
   const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
   const [toast, setToast] = useState({ message: '', type: 'success' });
   const [targetCommentId, setTargetCommentId] = useState(null);
+  const [readingEntry, setReadingEntry] = useState(null);
+  const [readingActionLoading, setReadingActionLoading] = useState(false);
 
   useEffect(() => {
     async function fetchBook() {
@@ -74,6 +81,26 @@ export default function BookDetail() {
     return () => clearTimeout(timer);
   }, [toast]);
 
+  useEffect(() => {
+    let ignore = false;
+    async function loadReadingStatus() {
+      if (!user) {
+        if (!ignore) setReadingEntry(null);
+        return;
+      }
+      try {
+        const entry = await fetchReadingStatus(id);
+        if (!ignore) setReadingEntry(entry);
+      } catch (err) {
+        console.warn('Unable to load reading status', err);
+      }
+    }
+    loadReadingStatus();
+    return () => {
+      ignore = true;
+    };
+  }, [id, user]);
+
   if (loading) return <Loader />;
   if (error) return <p className="error">{error}</p>;
   if (!book) return null;
@@ -87,6 +114,7 @@ export default function BookDetail() {
   const canAccessContent = !isPremium || isSubscriber;
   const isLoggedIn = Boolean(user);
   const canComment = isLoggedIn && (!isPremium || isSubscriber);
+  const isReading = readingEntry && !readingEntry.is_finished && !readingEntry.end_read_date;
 
   const handleAddComment = () => {
     if (!isLoggedIn) {
@@ -177,6 +205,42 @@ export default function BookDetail() {
   };
 
   const userComment = comments.find((c) => c.user_id === user?.id);
+  const readingStartLabel = readingEntry?.start_read_date
+    ? new Date(readingEntry.start_read_date).toLocaleDateString()
+    : null;
+  const readingEndLabel = readingEntry?.end_read_date
+    ? new Date(readingEntry.end_read_date).toLocaleDateString()
+    : null;
+
+  const handleLogStart = async () => {
+    if (!isLoggedIn) return;
+    if (isReading) return;
+    setReadingActionLoading(true);
+    try {
+      const entry = await logStartReading(book.id);
+      setReadingEntry(entry);
+    } catch (err) {
+      console.error('Error logging reading start:', err);
+      setToast({ message: 'Could not log reading activity.', type: 'error' });
+    } finally {
+      setReadingActionLoading(false);
+    }
+  };
+
+  const handleFinishReading = async () => {
+    if (!isReading) return;
+    setReadingActionLoading(true);
+    try {
+      const entry = await logFinishReading(book.id);
+      setReadingEntry(entry);
+      setToast({ message: 'Marked as finished.', type: 'success' });
+    } catch (err) {
+      console.error('Error finishing book:', err);
+      setToast({ message: 'Could not mark book as finished.', type: 'error' });
+    } finally {
+      setReadingActionLoading(false);
+    }
+  };
 
   const handleCommentButton = () => {
     if (userComment) {
@@ -253,15 +317,46 @@ export default function BookDetail() {
             <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem', alignItems: 'flex-start' }}>
               {canAccessContent ? (
                 <>
-                  <a
-                    href={contentUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="primary-btn"
-                    style={{ display: 'inline-block' }}
-                  >
-                    Read / Download
-                  </a>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'nowrap' }}>
+                    <a
+                      href={contentUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="primary-btn"
+                      style={{ display: 'inline-flex' }}
+                      onClick={handleLogStart}
+                    >
+                      Read / Download
+                    </a>
+                    {isReading && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'nowrap' }}>
+                        <button
+                          onClick={handleFinishReading}
+                          className="primary-btn finish-btn"
+                          disabled={readingActionLoading}
+                        >
+                          {readingActionLoading ? 'Saving...' : 'Mark as finished'}
+                        </button>
+                        {readingStartLabel && (
+                          <span style={{ color: '#1d2b1a', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                            Started on {readingStartLabel}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    {!isReading && readingEndLabel && (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', flexWrap: 'nowrap' }}>
+                        <span style={{ color: '#1d2b1a', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                          Finished on {readingEndLabel}
+                        </span>
+                        {readingStartLabel && (
+                          <span style={{ color: '#334155', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                            Started on {readingStartLabel}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={handleCommentButton}
                     className="primary-btn comment-btn"

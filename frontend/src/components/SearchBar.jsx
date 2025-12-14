@@ -98,7 +98,7 @@ export default function SearchBar({ onSearch = () => {} }) {
             </select>
           </div>
 
-          <div className="filter-group">
+          <div className="filter-group year-group">
             <label>Year range</label>
             <div className="year-range">
               <input

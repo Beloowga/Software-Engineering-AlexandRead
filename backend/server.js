@@ -6,6 +6,7 @@ import bookRoutes from './routes/bookRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import accountRoutes from './routes/accountRoutes.js';
 import savedBookRoutes from './routes/savedBookRoutes.js';
+import readBookRoutes from './routes/readBookRoutes.js';
 import subscriptionRoutes from './routes/subscriptionRoutes.js';
 import commentRoutes from './routes/commentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';

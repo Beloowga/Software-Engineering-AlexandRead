@@ -15,6 +15,10 @@ import {
   removeSavedBook,
   saveBook,
 } from '../services/savedBooks.js';
+import {
+  fetchReadBookIds,
+  markBookAsRead,
+} from '../services/readBooks.js';
 
 const AuthContext = createContext(null);
 
@@ -22,6 +26,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => getCurrentUser());
   const [initializing, setInitializing] = useState(() => Boolean(getCurrentToken()) && !user);
   const [savedBooks, setSavedBooks] = useState(new Set());
+  const [readBooks, setReadBooks] = useState(new Set());
 
   async function loadSavedBooks() {
     if (!getCurrentToken()) {
@@ -37,6 +42,20 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function loadReadBooks() {
+    if (!getCurrentToken()) {
+      setReadBooks(new Set());
+      return;
+    }
+    try {
+      const ids = await fetchReadBookIds();
+      setReadBooks(new Set(ids.map((id) => Number(id))));
+    } catch (err) {
+      console.warn('Unable to load read books', err);
+      setReadBooks(new Set());
+    }
+  }
+
   useEffect(() => {
     async function hydrate() {
       if (!getCurrentToken()) {
@@ -47,11 +66,13 @@ export function AuthProvider({ children }) {
         const profile = await fetchProfile();
         setUser(profile);
         await loadSavedBooks();
+        await loadReadBooks();
       } catch (err) {
         console.warn('Unable to refresh auth session', err);
         logoutUser();
         setUser(null);
         setSavedBooks(new Set());
+        setReadBooks(new Set());
       } finally {
         setInitializing(false);
       }
@@ -66,25 +87,32 @@ export function AuthProvider({ children }) {
       isAuthenticated,
       initializing,
       savedBooks: Array.from(savedBooks),
+      readBooks: Array.from(readBooks),
       isBookSaved(bookId) {
         return savedBooks.has(Number(bookId));
+      },
+      isBookRead(bookId) {
+        return readBooks.has(Number(bookId));
       },
       async login(credentials) {
         const profile = await loginUser(credentials);
         setUser(profile);
         await loadSavedBooks();
+        await loadReadBooks();
         return profile;
       },
       async register(form) {
         const profile = await registerUser(form);
         setUser(profile);
         await loadSavedBooks();
+        await loadReadBooks();
         return profile;
       },
       async refresh() {
         const profile = await fetchProfile();
         setUser(profile);
         await loadSavedBooks();
+        await loadReadBooks();
         return profile;
       },
       async updateProfile(updates) {
@@ -116,18 +144,32 @@ export function AuthProvider({ children }) {
           });
         }
       },
+      async addReadBook(bookId) {
+        const numericId = Number(bookId);
+        if (!numericId || Number.isNaN(numericId)) return;
+        if (!readBooks.has(numericId)) {
+          await markBookAsRead(numericId);
+          setReadBooks((prev) => {
+            const next = new Set(prev);
+            next.add(numericId);
+            return next;
+          });
+        }
+      },
       async deleteAccount() {
         await deleteAccountRequest();
         setUser(null);
         setSavedBooks(new Set());
+        setReadBooks(new Set());
       },
       logout() {
         logoutUser();
         setUser(null);
         setSavedBooks(new Set());
+        setReadBooks(new Set());
       },
     };
-  }, [user, initializing, savedBooks]);
+  }, [user, initializing, savedBooks, readBooks]);
 
   return (
     <AuthContext.Provider value={value}>

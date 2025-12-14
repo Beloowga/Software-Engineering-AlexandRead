@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { buildCoverUrl } from '../utils/storageUrls.js';
 import SaveBookButton from './SaveBookButton.jsx';
+import MarkAsReadButton from './MarkAsReadButton.jsx';
 import { fetchCommentStats } from '../services/comments.js';
 
 export default function BookCard({ book }) {
@@ -35,28 +36,17 @@ export default function BookCard({ book }) {
   return (
     <article className="book-card">
       <div className="book-card__image">
-        <SaveBookButton bookId={id} variant="card" />
         {premium && <span className="premium-badge">Premium</span>}
-        {stats.averageRating !== null && (
-          <div style={{
-            position: 'absolute',
-            top: '0.75rem',
-            right: '2.75rem',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.25rem',
-            padding: '0.4rem 0.6rem',
-            backgroundColor: '#fef3c7',
-            borderRadius: '0.35rem',
-            fontSize: '0.8rem',
-            fontWeight: '600',
-            color: '#1e293b',
-            zIndex: 5
-          }}>
-            <span style={{ color: '#f59e0b' }}>★</span>
-            <span>{stats.averageRating}</span>
-          </div>
-        )}
+        <div className="book-card__actions">
+          {stats.averageRating !== null && (
+            <div className="book-card__rating">
+              <span className="book-card__rating-star">★</span>
+              <span className="book-card__rating-value">{stats.averageRating}</span>
+            </div>
+          )}
+          <MarkAsReadButton bookId={id} variant="card" />
+          <SaveBookButton bookId={id} variant="card" />
+        </div>
         {imgUrl ? (
           <img
             src={imgUrl}

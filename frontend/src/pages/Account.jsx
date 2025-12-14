@@ -52,6 +52,7 @@ export default function AccountPage() {
     uploadAvatar,
     deleteAccount,
     savedBooks,
+    readBooks,
   } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,6 +66,9 @@ export default function AccountPage() {
   const [libraryBooks, setLibraryBooks] = useState([]);
   const [libraryLoading, setLibraryLoading] = useState(false);
   const [libraryError, setLibraryError] = useState('');
+  const [readBooksData, setReadBooksData] = useState([]);
+  const [readBooksLoading, setReadBooksLoading] = useState(false);
+  const [readBooksError, setReadBooksError] = useState('');
   const [readingEntries, setReadingEntries] = useState([]);
   const [readingLoading, setReadingLoading] = useState(false);
   const [readingError, setReadingError] = useState('');
@@ -123,6 +127,41 @@ export default function AccountPage() {
       ignore = true;
     };
   }, [savedBooks]);
+
+  useEffect(() => {
+    let ignore = false;
+    async function loadReadBooks() {
+      if (!readBooks?.length) {
+        setReadBooksData([]);
+        setReadBooksError('');
+        return;
+      }
+      setReadBooksLoading(true);
+      setReadBooksError('');
+      try {
+        const responses = await Promise.all(
+          readBooks.map((bookId) =>
+            api.get(`/books/${bookId}`).then((res) => res.data).catch(() => null),
+          ),
+        );
+        if (!ignore) {
+          setReadBooksData(responses.filter(Boolean));
+        }
+      } catch (err) {
+        if (!ignore) {
+          setReadBooksError('Unable to load your read books.');
+        }
+      } finally {
+        if (!ignore) {
+          setReadBooksLoading(false);
+        }
+      }
+    }
+    loadReadBooks();
+    return () => {
+      ignore = true;
+    };
+  }, [readBooks]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -476,6 +515,33 @@ export default function AccountPage() {
             ) : (
               <div className="library-tiles">
                 {libraryBooks.map((book) => (
+                  <Link key={book.id} to={`/books/${book.id}`} className="library-book">
+                    <span className="library-book__title">{book.title}</span>
+                    <span className="library-book__author">{book.author}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="account-card read-card">
+            <div className="library-head">
+              <h2>Already Read{readBooks?.length ? ` (${readBooks.length})` : ''}:</h2>
+              <p>{readBooksData.length === 0 ? 'Mark books as read to track your reading history.' : 'Books you have already read.'}</p>
+            </div>
+            {readBooksLoading ? (
+              <p>Loading your read books...</p>
+            ) : readBooksError ? (
+              <p className="status error">{readBooksError}</p>
+            ) : readBooksData.length === 0 ? (
+              <div className="library-tiles">
+                {[0, 1, 2].map((item) => (
+                  <div key={item} className="library-placeholder" />
+                ))}
+              </div>
+            ) : (
+              <div className="library-tiles">
+                {readBooksData.map((book) => (
                   <Link key={book.id} to={`/books/${book.id}`} className="library-book">
                     <span className="library-book__title">{book.title}</span>
                     <span className="library-book__author">{book.author}</span>

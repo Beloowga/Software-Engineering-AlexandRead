@@ -47,5 +47,5 @@ The platform is available on desktop web-browsing.
 
 ## Credits
 
-Kiran Kumar GANESAN, Marie-Lou JODET, Romain LEFEBVRE and Isabella LEWIS
+Kiran Kumar GANESAN, Marie-Lou JODET, Romain LEFEBVRE and Isabella LEWIS - CDOF3
 Students of ESILV in Year 4

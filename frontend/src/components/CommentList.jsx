@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { buildCoverUrl } from '../utils/storageUrls.js';
 import '../styles/components/CommentList.css';
 
 export default function CommentList({ comments, onDelete, onEdit, isLoading, targetCommentId = null }) {

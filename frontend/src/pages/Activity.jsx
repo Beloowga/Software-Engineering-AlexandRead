@@ -74,6 +74,7 @@ export default function ActivityPage() {
           setLibraryBooks(responses.filter(Boolean));
         }
       } catch (err) {
+        console.error('loadLibrary error', err);
         if (!ignore) {
           setLibraryError('Unable to load your saved books.');
         }
@@ -107,6 +108,7 @@ export default function ActivityPage() {
           setReadingEntries(entries);
         }
       } catch (err) {
+        console.error('loadReading error', err);
         if (!ignore) {
           setReadingError('Unable to load your current reads.');
         }
@@ -140,6 +142,7 @@ export default function ActivityPage() {
           setReadingHistory(entries);
         }
       } catch (err) {
+        console.error('loadHistory error', err);
         if (!ignore) {
           setHistoryError('Unable to load your reading history.');
         }
@@ -173,6 +176,7 @@ export default function ActivityPage() {
           setRecommendedBooks(books || []);
         }
       } catch (err) {
+        console.error('loadRecommendations error', err);
         if (!ignore) {
           setRecError('Unable to load recommendations right now.');
         }

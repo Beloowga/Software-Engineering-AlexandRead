@@ -39,7 +39,7 @@ export default function AdminDashboard() {
   const [bookStatus, setBookStatus] = useState('');
   const [bookError, setBookError] = useState('');
 
-  const [commentFilterBook, setCommentFilterBook] = useState('');
+  const [commentFilterBook] = useState('');
   const [comments, setComments] = useState([]);
   const [commentLoading, setCommentLoading] = useState(false);
   const [commentError, setCommentError] = useState('');
@@ -84,10 +84,6 @@ export default function AdminDashboard() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const bookLookup = useMemo(() => {
-    return new Map((books || []).map((b) => [b.id, b]));
-  }, [books]);
 
   const filteredBooks = useMemo(() => {
     const query = bookQuery.trim().toLowerCase();

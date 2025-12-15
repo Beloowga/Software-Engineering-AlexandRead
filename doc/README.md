@@ -7,6 +7,14 @@ The goal of the project is to regroup open-source references all in one place.
 We aim to make the references easily accessible so that readers can save their favorites and give feedback on them (ratings and comments).
 The platform is available on desktop web-browsing.
 
+## Documentation
+
+- API endpoints and payloads: [API.md](./API.md)
+- Backend stack and routes: [Backend.md](./Backend.md)
+- Frontend notes (React + Vite): [Frontend.md](./Frontend.md)
+- Database schema and storage: [Database.md](./Database.md)
+- UI captures and user flows: [Screenshots.md](./Screenshots.md)
+
 ## Prerequisites
 
 - Node.js 18+ and npm installed locally.

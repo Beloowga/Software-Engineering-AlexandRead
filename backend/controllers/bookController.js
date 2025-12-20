@@ -1,4 +1,3 @@
-// controllers/bookController.js
 import { supabase } from '../db.js';
 
 const COVERS_BUCKET = process.env.SUPABASE_COVERS_BUCKET || 'covers';
@@ -89,7 +88,6 @@ function buildBookPayload(body, { forCreate = false } = {}) {
   return { payload };
 }
 
-// GET /api/books
 export async function getBooks(req, res) {
   const { data, error } = await supabase
     .from('books')
@@ -104,7 +102,6 @@ export async function getBooks(req, res) {
   return res.json(data);
 }
 
-// GET /api/books/search - Search and filter books
 export async function searchBooks(req, res) {
   const { title, author, genre, year } = req.query;
 
@@ -113,7 +110,6 @@ export async function searchBooks(req, res) {
     .select('id, author, title, genre, year, summary, cover_image')
     .order('title');
 
-  // Apply filters
   if (title) {
     query = query.ilike('title', `%${title}%`);
   }
@@ -137,7 +133,6 @@ export async function searchBooks(req, res) {
   return res.json(data);
 }
 
-// GET /api/books/:id
 export async function getBookById(req, res) {
   const id = Number(req.params.id);
 
@@ -159,7 +154,6 @@ export async function getBookById(req, res) {
   return res.json(data);
 }
 
-// POST /api/admin/books
 export async function createBook(req, res) {
   const { payload, error: validationError } = buildBookPayload(req.body, { forCreate: true });
   if (validationError) {
@@ -180,7 +174,6 @@ export async function createBook(req, res) {
   return res.status(201).json(data);
 }
 
-// PUT /api/admin/books/:id
 export async function updateBook(req, res) {
   const bookId = Number(req.params.id);
   if (!bookId) {
@@ -215,7 +208,6 @@ export async function updateBook(req, res) {
   return res.json(data);
 }
 
-// DELETE /api/admin/books/:id
 export async function deleteBook(req, res) {
   const bookId = Number(req.params.id);
   if (!bookId) {

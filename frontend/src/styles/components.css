@@ -60,7 +60,6 @@
   z-index: 61;
 }
 
-/* Ensure action buttons always receive pointer events and show pointer cursor */
 .book-card__actions button,
 .save-btn {
   pointer-events: auto !important;

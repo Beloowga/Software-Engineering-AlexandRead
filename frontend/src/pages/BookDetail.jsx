@@ -53,7 +53,6 @@ export default function BookDetail() {
     fetchBook();
   }, [id]);
 
-  // Load comments and stats
   useEffect(() => {
     async function loadCommentsAndStats() {
       if (!book) return;
@@ -108,7 +107,6 @@ export default function BookDetail() {
   const contentUrl = buildBookContentUrl(book.content);
   const isPremium = Boolean(book.premium);
   
-  // Check if user has active subscription
   const isSubscriber = user?.subscription?.isActive;
   const canAccessContent = !isPremium || isSubscriber;
   const isLoggedIn = Boolean(user);
@@ -133,7 +131,6 @@ export default function BookDetail() {
       const newComment = await postComment(book.id, rating, comment);
       setComments([newComment, ...comments]);
       
-      // Refresh stats
       const updatedStats = await fetchCommentStats(book.id);
       setCommentStats(updatedStats);
       
@@ -159,7 +156,6 @@ export default function BookDetail() {
       await deleteCommentRequest(deleteTargetId);
       setComments(comments.filter((c) => c.id !== deleteTargetId));
       
-      // Refresh stats
       const updatedStats = await fetchCommentStats(book.id);
       setCommentStats(updatedStats);
       

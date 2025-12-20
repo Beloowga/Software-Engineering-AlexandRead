@@ -6,10 +6,9 @@ export async function getRecommendations(req, res) {
     return res.status(401).json({ error: 'Authentication required.' });
   }
 
-  const LIMIT = 5; // How many books per category
+  const LIMIT = 5;
   
   try {
-    // 1. Fetch User Preferences for Content-Based Filtering
     const { data: userProfile, error: userError } = await supabase
       .from('account')
       .select('favourite_genres, favourite_author')
@@ -18,7 +17,6 @@ export async function getRecommendations(req, res) {
 
     if (userError) throw userError;
 
-    // 2. Fetch User's Read History (to exclude from recommendations)
     const { data: readHistory } = await supabase
       .from('acc_reading')
       .select('book_id')
@@ -27,7 +25,6 @@ export async function getRecommendations(req, res) {
     const readBookIds = new Set(readHistory?.map(r => r.book_id) || []);
     const recommendedIds = new Set();
 
-    // --- A. COLLABORATIVE FILTERING (RPC Call) ---
     const { data: collabData, error: collabError } = await supabase
       .rpc('get_collab_recs', { 
         target_user_id: userId, 
@@ -40,8 +37,6 @@ export async function getRecommendations(req, res) {
       });
     }
 
-    // --- B. CONTENT-BASED FILTERING (Supabase Query) ---
-    // Match favorite author OR favorite genres (safely handle empty preferences)
     const genres = Array.isArray(userProfile?.favourite_genres) ? userProfile.favourite_genres : [];
     const favouriteAuthor = (userProfile?.favourite_author || '').trim();
 
@@ -73,8 +68,6 @@ export async function getRecommendations(req, res) {
       }
     }
 
-    // --- C. TRENDING / FALLBACK (RPC Call) ---
-    // If we don't have enough recs, fill with trending
     if (recommendedIds.size < 5) {
       const { data: trendingData } = await supabase
         .rpc('get_trending_books', { limit_count: LIMIT });
@@ -86,8 +79,6 @@ export async function getRecommendations(req, res) {
       }
     }
 
-    // --- D. FINAL FETCH ---
-    // We now have a list of IDs. Fetch the actual book details.
     if (recommendedIds.size === 0) return res.json([]);
 
     const { data: finalBooks, error: finalError } = await supabase
@@ -97,7 +88,6 @@ export async function getRecommendations(req, res) {
 
     if (finalError) throw finalError;
 
-    // Optional: Shuffle the results
     const shuffled = finalBooks.sort(() => 0.5 - Math.random());
 
     return res.json(shuffled);

@@ -148,7 +148,6 @@ export async function startReading(req, res) {
     return res.status(500).json({ error: 'Unable to check existing reading entry.' });
   }
 
-  // If an active entry already exists, just return it.
   if (existing && !existing.is_finished && !existing.end_read_date) {
     return res.json({ entry: existing });
   }

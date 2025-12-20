@@ -17,14 +17,12 @@ const router = express.Router();
 
 router.use(requireAuth, requireAdmin);
 
-// Book management
 router.post('/books', createBook);
 router.put('/books/:id', updateBook);
 router.delete('/books/:id', deleteBook);
 router.post('/upload/cover', uploadCover);
 router.post('/upload/book', uploadBookFile);
 
-// Comment and rating moderation
 router.get('/comments', adminListComments);
 router.put('/comments/:id', adminUpdateComment);
 router.delete('/comments/:id', adminDeleteComment);

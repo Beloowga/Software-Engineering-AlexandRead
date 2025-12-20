@@ -1,11 +1,7 @@
-/* Page-level styles moved from the former global bundle. */
-
-/* Activity */
 .activity-title {
   margin: 0;
 }
 
-/* Book detail extras */
 .book-detail__title-meta {
   display: flex;
   align-items: center;
@@ -79,7 +75,6 @@
   margin-top: 1rem;
 }
 
-/* Admin dashboard */
 .admin-hidden-input {
   display: none;
 }

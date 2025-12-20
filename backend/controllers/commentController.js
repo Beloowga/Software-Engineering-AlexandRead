@@ -1,6 +1,5 @@
 import { supabase } from '../db.js';
 
-// Get comment statistics (average rating and count) for a book
 export async function getCommentStats(req, res) {
   const { bookId } = req.params;
 
@@ -30,14 +29,12 @@ export async function getCommentStats(req, res) {
   }
 }
 
-// Get all comments for a book with user info
 export async function getCommentsByBookId(req, res) {
   const { bookId } = req.params;
   const limit = parseInt(req.query.limit) || 10;
   const offset = parseInt(req.query.offset) || 0;
 
   try {
-    // Get comments with related user data
     const { data: comments, error: commentError, count } = await supabase
       .from('comments')
       .select('*', { count: 'exact' })
@@ -50,7 +47,6 @@ export async function getCommentsByBookId(req, res) {
       return res.status(400).json({ error: 'Failed to fetch comments' });
     }
 
-    // Get user details for each comment
     const commentsWithUsers = await Promise.all(
       (comments || []).map(async (comment) => {
         const { data: userData } = await supabase
@@ -73,12 +69,10 @@ export async function getCommentsByBookId(req, res) {
   }
 }
 
-// Create a new comment
 export async function createComment(req, res) {
   const userId = req.auth?.userId;
   const { bookId, rating, comment } = req.body;
 
-  // Validation
   if (!userId) {
     return res.status(401).json({ error: 'User not authenticated' });
   }
@@ -96,7 +90,6 @@ export async function createComment(req, res) {
   }
 
   try {
-    // Check if book exists
     const { data: bookData, error: bookError } = await supabase
       .from('books')
       .select('id, premium')
@@ -107,7 +100,6 @@ export async function createComment(req, res) {
       return res.status(404).json({ error: 'Book not found' });
     }
 
-    // Check if user already has a comment on this book
     const { data: existingComment } = await supabase
       .from('comments')
       .select('id')
@@ -119,7 +111,6 @@ export async function createComment(req, res) {
       return res.status(409).json({ error: 'You already have a comment on this book. Delete it first to add a new one.' });
     }
 
-    // Check if premium book and user is not premium
     if (bookData.premium) {
       const { data: userData, error: userError } = await supabase
         .from('account')
@@ -127,7 +118,6 @@ export async function createComment(req, res) {
         .eq('id', userId)
         .maybeSingle();
 
-      // Check if subscription is active (end_sub_date is in the future)
       const isSubscriptionActive = userData?.end_sub_date 
         ? new Date(userData.end_sub_date) >= new Date()
         : false;
@@ -139,7 +129,6 @@ export async function createComment(req, res) {
       }
     }
 
-    // Insert the comment
     const { data, error } = await supabase
       .from('comments')
       .insert([{
@@ -156,7 +145,6 @@ export async function createComment(req, res) {
       return res.status(400).json({ error: 'Failed to create comment' });
     }
 
-    // Get user data for the response
     const { data: userData } = await supabase
       .from('account')
       .select('id, name, email, avatar_url')
@@ -175,7 +163,6 @@ export async function createComment(req, res) {
   }
 }
 
-// Delete a comment
 export async function deleteComment(req, res) {
   const userId = req.auth?.userId;
   const { commentId } = req.params;
@@ -185,7 +172,6 @@ export async function deleteComment(req, res) {
   }
 
   try {
-    // Check if comment exists and belongs to user
     const { data: comment, error: commentError } = await supabase
       .from('comments')
       .select('id, user_id')
@@ -200,7 +186,6 @@ export async function deleteComment(req, res) {
       return res.status(403).json({ error: 'You can only delete your own comments' });
     }
 
-    // Delete the comment
     const { error } = await supabase
       .from('comments')
       .delete()
@@ -218,7 +203,6 @@ export async function deleteComment(req, res) {
   }
 }
 
-// Update an existing comment
 export async function updateComment(req, res) {
   const userId = req.auth?.userId;
   const { commentId } = req.params;
@@ -240,7 +224,6 @@ export async function updateComment(req, res) {
   }
 
   try {
-    // Ensure the comment exists and belongs to the user
     const { data: existingComment, error: fetchError } = await supabase
       .from('comments')
       .select('id, user_id, book_id')
@@ -271,7 +254,6 @@ export async function updateComment(req, res) {
       return res.status(400).json({ error: 'Failed to update comment' });
     }
 
-    // Attach user info for frontend
     const { data: userData } = await supabase
       .from('account')
       .select('id, name, email, avatar_url')
@@ -288,7 +270,6 @@ export async function updateComment(req, res) {
   }
 }
 
-// Admin: list comments with user and book info
 export async function adminListComments(req, res) {
   const limit = Math.min(Number(req.query.limit) || 50, 100);
   const offset = Number(req.query.offset) || 0;
@@ -346,7 +327,6 @@ export async function adminListComments(req, res) {
   }
 }
 
-// Admin: update comment regardless of owner
 export async function adminUpdateComment(req, res) {
   const commentId = Number(req.params.id);
   if (!commentId) {
@@ -408,7 +388,6 @@ export async function adminUpdateComment(req, res) {
   }
 }
 
-// Admin: delete comment
 export async function adminDeleteComment(req, res) {
   const commentId = Number(req.params.id);
   if (!commentId) {

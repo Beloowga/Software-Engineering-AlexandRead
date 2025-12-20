@@ -30,6 +30,12 @@ Related docs: [README.md](./README.md) | [API.md](./API.md) | [Backend.md](./Bac
 ![Premium tier](screenshots/sub_premium.png)  View with active subscription and remaining days/auto-renew toggle.
 
 ## Admin Console
+
+To test the following functionalities, connect using the following credentials : 
+
+- User: admin@admin.fr
+- Password: 1234
+
 ![Admin top](screenshots/admin_top.png)  Entry dashboard for admins.
 ![Catalog](screenshots/admin_catalog.png)  Searchable/filterable book list and ratings for admins.
 ![Edit books](screenshots/admin_edit_books.png)  Editing interface for books.
